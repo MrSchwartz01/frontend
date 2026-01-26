@@ -16,6 +16,6 @@
     }
   ],
   "env": {
-    "VUE_APP_API_URL": "@api_url"
+    "VUE_APP_API_URL": "https://backend-chpc-production.up.railway.app/api"
   }
 }
