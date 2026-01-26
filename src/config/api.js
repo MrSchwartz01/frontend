@@ -9,14 +9,14 @@ function getApiBaseUrl() {
     return process.env.VUE_APP_API_URL;
   }
   
-  // Si se accede desde localhost/127.0.0.1, usar localhost con /api
+  // Si se accede desde localhost/127.0.0.1, usar la URL de Railway por defecto
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:5000/api';
+    return 'https://backend-chpc-production.up.railway.app/api';
   }
   
-  // Si se accede desde una IP de red local, usar esa misma IP para el backend con /api
-  return `http://${hostname}:5000/api`;
+  // Para cualquier otro caso, usar la URL de Railway
+  return 'https://backend-chpc-production.up.railway.app/api';
 }
 
 const API_BASE_URL = getApiBaseUrl();

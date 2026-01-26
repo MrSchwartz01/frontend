@@ -3,7 +3,7 @@
 Write-Host "=== Prueba del Sistema de Recuperacion de Contrasenas ===" -ForegroundColor Cyan
 Write-Host ""
 
-$API_BASE = "http://localhost:5000/api"
+$API_BASE = "https://backend-chpc-production.up.railway.app/api"
 
 # Verificar que el servidor este corriendo
 Write-Host "1. Verificando conexion al servidor..." -ForegroundColor Yellow
