@@ -19,7 +19,9 @@
       "dest": "/index.html"
     }
   ],
-  "env": {
-    "VUE_APP_API_URL": "https://backend-chpc-production.up.railway.app/api"
+  "build": {
+    "env": {
+      "VUE_APP_API_URL": "https://backend-chpc-production.up.railway.app/api"
+    }
   }
 }
