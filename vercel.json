@@ -21,7 +21,7 @@
   ],
   "build": {
     "env": {
-      "VUE_APP_API_URL": "https://backend-chpc-production.up.railway.app/api"
+      "VUE_APP_API_URL": "https://chpc-webpage-back.vercel.app/api"
     }
   }
 }
