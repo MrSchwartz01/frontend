@@ -7,7 +7,7 @@ module.exports = defineConfig({
   devServer: {
     proxy:{
       '/api': {
-        target: 'https://backend-chpc-production.up.railway.app', // Cambia esto al backend real
+        target: 'https://chpc-webpage-back.vercel.app', // Cambia esto al backend real
         changeOrigin: true,
         pathRewrite: { '^/api': '' },
       },
