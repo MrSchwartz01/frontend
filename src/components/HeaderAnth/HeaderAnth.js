@@ -1,5 +1,4 @@
-import axios from "axios";
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 
 export default {
     name: "HeaderAnth",
@@ -52,17 +51,13 @@ export default {
           this.mostrandoSugerencias = false;
           this.sugerencias = [];
           
-          // Si estamos en HomePage, emitir evento
-          if (this.$route.name === 'HomePage') {
-            this.$emit('buscar', query);
-          } else {
-            // Si estamos en otra página, redirigir a HomePage con búsqueda
-            this.$router.push({ name: 'HomePage', query: { search: query } });
-          }
+          // Siempre redirigir a la página de productos con la búsqueda
+          // Esto permite ver todos los resultados filtrados
+          this.$router.push({ path: '/productos', query: { search: query } });
         }
       },
       onInput() {
-        this.buscarProductos();
+        // Solo programar sugerencias, NO ejecutar búsqueda completa en cada tecla
         this.programarCargaSugerencias();
       },
       programarCargaSugerencias() {
@@ -83,8 +78,7 @@ export default {
       async cargarSugerencias(query) {
         this.cargandoSugerencias = true;
         try {
-          const response = await axios.get(
-            `${API_BASE_URL}/tienda/productos`,
+          const response = await apiClient.get('/tienda/productos',
             {
               params: { search: query },
             },
@@ -151,10 +145,12 @@ export default {
       async cargarMarcas() {
         try {
           console.log('Cargando marcas desde API...');
-          const response = await axios.get(`${API_BASE_URL}/tienda/productos`);
+          const response = await apiClient.get('/tienda/productos');
           console.log('Respuesta de API:', response.data);
           
-          const productos = Array.isArray(response.data) ? response.data : [];
+          // La API devuelve { data: [...], total, page, limit, totalPages }
+          const productosArray = response.data.data || response.data;
+          const productos = Array.isArray(productosArray) ? productosArray : [];
           console.log('Total de productos:', productos.length);
           
           // Debug: Verificar si los productos tienen el campo marca

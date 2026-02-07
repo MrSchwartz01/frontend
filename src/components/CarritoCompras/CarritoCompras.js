@@ -1,7 +1,6 @@
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
-import axios from 'axios';
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 
 export default {
   name: "CarritoCompras",
@@ -30,7 +29,7 @@ export default {
     subtotalConIVA() {
       // Total de productos con IVA incluido
       return this.productosCarrito.reduce((total, item) => {
-        return total + (parseFloat(item.precio) * item.cantidad);
+        return total + (parseFloat(item.costoTotal) * item.cantidad);
       }, 0);
     },
     subtotal() {
@@ -58,10 +57,17 @@ export default {
     }
   },
   methods: {
+    handleImageError(event) {
+      // Prevenir loop infinito: solo cambiar si no es ya el placeholder
+      if (!event.target.dataset.fallback) {
+        event.target.dataset.fallback = 'true';
+        event.target.src = '/placeholder_product.jpg';
+      }
+    },
     async cargarDatosUsuario() {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_BASE_URL}/usuarios/perfil`, {
+        const response = await apiClient.get('/usuarios/perfil', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -91,24 +97,24 @@ export default {
       localStorage.setItem("carrito", JSON.stringify(this.productosCarrito));
     },
     calcularSubtotal(item) {
-      return (parseFloat(item.precio) * item.cantidad).toFixed(2);
+      return (parseFloat(item.costoTotal) * item.cantidad).toFixed(2);
     },
-    aumentarCantidad(id) {
-      const producto = this.productosCarrito.find((p) => p.id === id);
+    aumentarCantidad(codigo) {
+      const producto = this.productosCarrito.find((p) => p.codigo === codigo);
       if (producto) {
         producto.cantidad++;
         this.guardarCarrito();
       }
     },
-    disminuirCantidad(id) {
-      const producto = this.productosCarrito.find((p) => p.id === id);
+    disminuirCantidad(codigo) {
+      const producto = this.productosCarrito.find((p) => p.codigo === codigo);
       if (producto && producto.cantidad > 1) {
         producto.cantidad--;
         this.guardarCarrito();
       }
     },
-    eliminarProducto(id) {
-      this.productosCarrito = this.productosCarrito.filter((p) => p.id !== id);
+    eliminarProducto(codigo) {
+      this.productosCarrito = this.productosCarrito.filter((p) => p.codigo !== codigo);
       this.guardarCarrito();
     },
     vaciarCarrito() {
@@ -139,8 +145,9 @@ export default {
         const token = localStorage.getItem('access_token');
         
         // Preparar items para el backend
+        // Asegurar que productId sea un número entero
         const items = this.productosCarrito.map(producto => ({
-          productId: parseInt(producto.id),
+          productId: parseInt(producto.codigo, 10),
           cantidad: producto.cantidad
         }));
 
@@ -155,8 +162,7 @@ export default {
           observaciones: 'Pedido pendiente de coordinación con vendedor' // Nota automática
         };
 
-        const response = await axios.post(
-          `${API_BASE_URL}/ordenes`,
+        const response = await apiClient.post('/ordenes',
           orderData,
           {
             headers: { Authorization: `Bearer ${token}` }

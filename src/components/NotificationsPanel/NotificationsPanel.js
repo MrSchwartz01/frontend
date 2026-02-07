@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '@/services/api';
 import { API_BASE_URL } from '@/config/api';
 
 export default {
@@ -25,7 +25,7 @@ export default {
       this.loading = true;
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_BASE_URL}/notifications`, {
+        const response = await apiClient.get('/notifications', {
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -41,7 +41,7 @@ export default {
     async loadUnreadCount() {
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_BASE_URL}/notifications/unread-count`, {
+        const response = await apiClient.get('/notifications/unread-count', {
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -58,13 +58,9 @@ export default {
     async markAsRead(notificationId) {
       try {
         const token = localStorage.getItem('access_token');
-        await axios.patch(
-          `${API_BASE_URL}/notifications/${notificationId}/read`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        await apiClient.patch(`/notifications/${notificationId}/read`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         
         // Actualizar localmente
         const notification = this.notifications.find(n => n.id === notificationId);
@@ -80,13 +76,9 @@ export default {
     async markAllAsRead() {
       try {
         const token = localStorage.getItem('access_token');
-        await axios.post(
-          `${API_BASE_URL}/notifications/mark-all-read`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        await apiClient.post('/notifications/mark-all-read', {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         
         // Actualizar todas localmente
         this.notifications.forEach(n => n.leida = true);
@@ -105,6 +97,15 @@ export default {
       const token = localStorage.getItem('access_token');
       if (!token) return;
 
+      // TEMPORALMENTE DESACTIVADO - El endpoint /notifications/stream no existe en el backend
+      // TODO: Reactivar cuando se implemente el endpoint de notificaciones en tiempo real
+      const streamEnabled = false;
+      
+      if (!streamEnabled) {
+        console.log('Stream de notificaciones desactivado temporalmente');
+        return;
+      }
+      
       // Conectar a Server-Sent Events
       this.eventSource = new EventSource(
         `${API_BASE_URL}/notifications/stream`,

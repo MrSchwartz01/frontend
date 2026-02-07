@@ -1,5 +1,4 @@
-import axios from "axios";
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import CarouselBanner from "../CarouselBanner/CarouselBanner.vue";
@@ -95,7 +94,7 @@ export default {
     try {
       // Cargar Banners desde la API
       try {
-        const bannersResponse = await axios.get(`${API_BASE_URL}/tienda/banners`);
+        const bannersResponse = await apiClient.get('/tienda/banners');
         this.banners = bannersResponse.data.data || bannersResponse.data || [];
         console.log('Banners cargados:', this.banners.length);
       } catch (bannerError) {
@@ -108,13 +107,15 @@ export default {
       }
 
       // Cargar Productos
-      const productosResponse = await axios.get(`${API_BASE_URL}/tienda/productos`);
-      this.productos = productosResponse.data.map((producto) => ({
+      const productosResponse = await apiClient.get('/tienda/productos');
+      // La API devuelve { data: [...], total, page, limit, totalPages }
+      const productosArray = productosResponse.data.data || productosResponse.data;
+      this.productos = productosArray.map((producto) => ({
         ...producto,
         imagen_url:
           producto.media?.length > 0
-            ? `https://backend-chpc-production.up.railway.app${producto.media[0].url}`
-            : producto.imagen_url || "ruta-imagen-default.png",
+            ? `${process.env.VUE_APP_API_URL?.replace('/api', '') || ''}${producto.media[0].url}`
+            : producto.imagen_url || "/placeholder_product.jpg",
       }));
       
       console.log('Total de productos cargados:', this.productos.length);
@@ -125,21 +126,22 @@ export default {
       console.log('Categorías únicas encontradas:', categoriasUnicas);
       
       // Cargar Promociones Activas
-      const promocionesResponse = await axios.get(`${API_BASE_URL}/promociones/activas`);
+      const promocionesResponse = await apiClient.get('/promociones/activas');
       this.promociones = promocionesResponse.data;
       
       // Combinar promociones con productos
       this.aplicarPromocionesAProductos();
       
-      this.cargarMasProductos();
+      // Procesar la búsqueda inicial DESPUÉS de cargar productos (si existe)
+      const search = this.$route.query.search;
+      if (search) {
+        this.searchQuery = search;
+        this.buscarProductos(search);
+      } else {
+        this.cargarMasProductos();
+      }
     } catch (error) {
       console.error("Error al cargar los datos:", error);
-    }
-
-    // Procesar la búsqueda inicial (si existe)
-    const search = this.$route.query.search;
-    if (search) {
-      this.buscarProductos(search);
     }
   },
   computed: {
@@ -157,9 +159,9 @@ export default {
     aplicarPromocionesAProductos() {
       // Agregar información de promoción a cada producto
       this.productos = this.productos.map(producto => {
-        const promocion = this.promociones.find(p => p.producto_id === producto.id);
+        const promocion = this.promociones.find(p => p.producto_id === producto.codigo);
         if (promocion) {
-          const precioOriginal = producto.precio;
+          const precioOriginal = producto.costoTotal;
           const precioConDescuento = precioOriginal - (precioOriginal * promocion.porcentaje_descuento / 100);
           return {
             ...producto,
@@ -186,7 +188,7 @@ export default {
       // Filtrado por rango de precio
       if (this.selectedPriceRange) {
         lista = lista.filter((producto) => {
-          const precio = Number(producto.precio ?? 0);
+          const precio = Number(producto.costoTotal ?? 0);
           if (this.selectedPriceRange === "low") {
             return precio < 100;
           }
@@ -204,17 +206,17 @@ export default {
       if (query !== "") {
         lista = lista.filter(
           (producto) => {
-            const nombre = (producto.nombre_producto || "").toLowerCase();
-            const descripcion = (producto.descripcion || "").toLowerCase();
+            const nombre = (producto.producto || "").toLowerCase();
             const marca = (producto.marca || "").toLowerCase();
-            const categoria = (producto.categoria || "").toLowerCase();
-            const sku = (producto.sku || "").toLowerCase();
+            const medida = (producto.medida || "").toLowerCase();
+            const almacen = (producto.almacen || "").toLowerCase();
+            const codigo = String(producto.codigo || "").toLowerCase();
             
             return nombre.includes(query) ||
-                   descripcion.includes(query) ||
                    marca.includes(query) ||
-                   categoria.includes(query) ||
-                   sku.includes(query);
+                   medida.includes(query) ||
+                   almacen.includes(query) ||
+                   codigo.includes(query);
           }
         );
       }
@@ -237,8 +239,15 @@ export default {
 
       this.productosMostrados = [...this.productosMostrados, ...siguienteBloque];
     },
-    verDetalle(id) {
-      this.$router.push({ name: "ProductoDetalle", params: { id } });
+    verDetalle(codigo) {
+      this.$router.push({ name: "ProductoDetalle", params: { id: codigo } });
+    },
+    handleImageError(event) {
+      // Prevenir loop infinito: solo cambiar si no es ya el placeholder
+      if (!event.target.dataset.fallback) {
+        event.target.dataset.fallback = 'true';
+        event.target.src = '/placeholder_product.jpg';
+      }
     },
     buscarProductos(query) {
       this.searchQuery = query.trim();
@@ -276,7 +285,7 @@ export default {
       }
 
       // Verificar si el producto ya está en el carrito
-      const productoExistente = carrito.find(p => p.id === producto.id);
+      const productoExistente = carrito.find(p => p.codigo === producto.codigo);
       
       if (productoExistente) {
         // Aumentar cantidad
@@ -285,12 +294,13 @@ export default {
       } else {
         // Agregar nuevo producto
         carrito.push({
-          id: producto.id,
-          nombre: producto.nombre_producto,
+          codigo: producto.codigo,
+          producto: producto.producto,
           marca: producto.marca,
-          precio: producto.precio,
+          costoTotal: producto.costoTotal,
           cantidad: 1,
-          imagen_url: producto.imagen_url
+          imagen_url: producto.imagen_url,
+          medida: producto.medida
         });
         alert('Producto agregado al carrito');
       }
@@ -309,19 +319,19 @@ export default {
       });
     },
     getProductosPorCategoria(nombreCategoria) {
-      // Intentar encontrar productos cuya categoría coincida (insensible a mayúsculas)
+      // Intentar encontrar productos cuya marca coincida (insensible a mayúsculas)
       let productosFiltrados = this.productos.filter((producto) =>
-        producto.categoria?.toLowerCase() === nombreCategoria.toLowerCase()
+        producto.marca?.toLowerCase() === nombreCategoria.toLowerCase()
       );
 
-      // Si no hay coincidencia exacta, probar coincidencia parcial en la categoría
+      // Si no hay coincidencia exacta, probar coincidencia parcial en la marca
       if (productosFiltrados.length === 0) {
         productosFiltrados = this.productos.filter((producto) =>
-          producto.categoria?.toLowerCase().includes(nombreCategoria.toLowerCase())
+          producto.marca?.toLowerCase().includes(nombreCategoria.toLowerCase())
         );
       }
 
-      // Si aún así no hay productos para esa categoría, usamos un fallback
+      // Si aún así no hay productos para esa marca, usamos un fallback
       if (productosFiltrados.length === 0) {
         productosFiltrados = this.productos.slice(0, 6);
       }

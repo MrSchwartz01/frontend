@@ -1,11 +1,11 @@
-import axios from 'axios';
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 
 export default {
   name: 'AdminProductos',
   data() {
     return {
       productos: [],
+      productosFiltrados: [],
       imagenes: [],
       cargando: true,
       cargandoImagenes: false,
@@ -19,53 +19,148 @@ export default {
       archivoSeleccionado: null,
       imagenPrincipal: false,
       formProducto: this.getEmptyForm(),
+      // Filtros
+      filtros: {
+        busqueda: '',
+        marca: '',
+        medida: '',
+        stock: '',
+      },
+      // Opciones disponibles para filtros
+      marcasDisponibles: [],
+      medidasDisponibles: [],
     };
   },
   async mounted() {
     await this.cargarProductos();
   },
   methods: {
+    handleImageError(event) {
+      // Prevenir loop infinito: solo cambiar si no es ya el placeholder
+      if (!event.target.dataset.fallback) {
+        event.target.dataset.fallback = 'true';
+        event.target.src = '/placeholder_product.jpg';
+      }
+    },
+    
     getEmptyForm() {
       return {
-        nombre_producto: '',
-        descripcion: '',
-        precio: 0,
-        stock: 0,
+        codigo: '',
+        producto: '',
         marca: '',
-        color: '',
-        categoria: '',
-        subcategoria: '',
-        modelo: '',
-        sku: '',
-        especificaciones: '',
+        medida: '',
+        almacen: '',
         garantia: '',
-        imagen_url: '/placeholder.jpg', // Imagen por defecto
-        destacado: false,
-        activo: true,
+        costoTotal: 0,
+        existenciaTotal: '0',
       };
     },
 
     async cargarProductos() {
       try {
         this.cargando = true;
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_BASE_URL}/tienda/productos`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        // Mostrar todos los productos, incluso inactivos
-        this.productos = response.data;
+        // El interceptor de apiClient ya agrega el token automáticamente
+        // y manejará errores 401 (incluyendo refresh token y redirección al login)
+        const response = await apiClient.get('/tienda/productos/admin/todos');
+        // La API devuelve { data: [...], total, page, limit, totalPages }
+        // Mostrar todos los productos, incluso sin stock o sin precio
+        this.productos = response.data.data || response.data;
+        this.productosFiltrados = [...this.productos];
+        this.extraerOpcionesFiltros();
       } catch (error) {
         console.error('Error al cargar productos:', error);
-        alert('Error al cargar productos');
+        // Solo mostrar mensaje si no es error 401 (el interceptor ya lo maneja)
+        if (error.response?.status !== 401) {
+          alert('Error al cargar productos: ' + (error.response?.data?.message || error.message));
+        }
       } finally {
         this.cargando = false;
       }
     },
 
+    extraerOpcionesFiltros() {
+      // Extraer marcas únicas
+      const marcasSet = new Set();
+      this.productos.forEach(p => {
+        if (p.marca) marcasSet.add(p.marca);
+      });
+      this.marcasDisponibles = Array.from(marcasSet).sort();
+
+      // Extraer medidas únicas
+      const medidasSet = new Set();
+      this.productos.forEach(p => {
+        if (p.medida) medidasSet.add(p.medida);
+      });
+      this.medidasDisponibles = Array.from(medidasSet).sort();
+    },
+
+    aplicarFiltros() {
+      let resultado = [...this.productos];
+
+      // Filtro por búsqueda de texto
+      if (this.filtros.busqueda) {
+        const busqueda = this.filtros.busqueda.toLowerCase();
+        resultado = resultado.filter(p =>
+          (p.producto && p.producto.toLowerCase().includes(busqueda)) ||
+          (p.codigo && p.codigo.toString().includes(busqueda)) ||
+          (p.marca && p.marca.toLowerCase().includes(busqueda))
+        );
+      }
+
+      // Filtro por marca
+      if (this.filtros.marca) {
+        resultado = resultado.filter(p => p.marca === this.filtros.marca);
+      }
+
+      // Filtro por medida
+      if (this.filtros.medida) {
+        resultado = resultado.filter(p => p.medida === this.filtros.medida);
+      }
+
+      // Filtro por stock
+      if (this.filtros.stock) {
+        resultado = resultado.filter(p => {
+          const stock = parseInt(p.existenciaTotal) || 0;
+          switch (this.filtros.stock) {
+            case 'con-stock':
+              return stock > 0;
+            case 'sin-stock':
+              return stock === 0;
+            case 'bajo-stock':
+              return stock > 0 && stock < 10;
+            default:
+              return true;
+          }
+        });
+      }
+
+      this.productosFiltrados = resultado;
+    },
+
+    limpiarFiltros() {
+      this.filtros = {
+        busqueda: '',
+        marca: '',
+        medida: '',
+        stock: '',
+      };
+      this.productosFiltrados = [...this.productos];
+    },
+
     editarProducto(producto) {
       this.editando = true;
       this.productoActual = producto;
-      this.formProducto = { ...producto };
+      // Solo copiar los campos editables del formulario
+      this.formProducto = {
+        codigo: producto.codigo,
+        producto: producto.producto || '',
+        marca: producto.marca || '',
+        medida: producto.medida || '',
+        almacen: producto.almacen || '',
+        garantia: producto.garantia || '',
+        costoTotal: producto.costoTotal || 0,
+        existenciaTotal: producto.existenciaTotal || '0',
+      };
       this.showEditModal = true;
     },
 
@@ -75,17 +170,28 @@ export default {
         const token = localStorage.getItem('access_token');
         const headers = { Authorization: `Bearer ${token}` };
 
+        // Preparar solo los campos válidos para el backend
+        const datosProducto = {
+          producto: this.formProducto.producto,
+          marca: this.formProducto.marca,
+          medida: this.formProducto.medida,
+          almacen: this.formProducto.almacen,
+          garantia: this.formProducto.garantia,
+          costoTotal: parseFloat(this.formProducto.costoTotal) || 0,
+          existenciaTotal: this.formProducto.existenciaTotal?.toString() || '0',
+        };
+
         if (this.editando) {
           // Actualizar producto existente
-          await axios.put(
-            `${API_BASE_URL}/tienda/productos/${this.productoActual.id}`,
-            this.formProducto,
+          await apiClient.put(
+            `/tienda/productos/${this.productoActual.codigo}`,
+            datosProducto,
             { headers }
           );
           alert('Producto actualizado correctamente');
         } else {
           // Crear nuevo producto
-          await axios.post(`${API_BASE_URL}/tienda/productos`, this.formProducto, {
+          await apiClient.post('/tienda/productos', this.formProducto, {
             headers,
           });
           alert('Producto creado correctamente');
@@ -107,8 +213,8 @@ export default {
 
       try {
         const token = localStorage.getItem('access_token');
-        await axios.put(
-          `${API_BASE_URL}/tienda/productos/${producto.id}`,
+        await apiClient.put(
+          `/tienda/productos/${producto.id}`,
           { activo: !producto.activo },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -123,16 +229,13 @@ export default {
     async gestionarImagenes(producto) {
       this.productoActual = producto;
       this.showImagenesModal = true;
-      await this.cargarImagenes(producto.id);
+      await this.cargarImagenes(producto.codigo);
     },
 
-    async cargarImagenes(productoId) {
+    async cargarImagenes(productoCodigo) {
       try {
         this.cargandoImagenes = true;
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_BASE_URL}/images/producto/${productoId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await apiClient.get(`/images/producto/${productoCodigo}`);
         this.imagenes = response.data;
       } catch (error) {
         console.error('Error al cargar imágenes:', error);
@@ -168,45 +271,49 @@ export default {
 
       try {
         this.subiendoImagen = true;
-        const token = localStorage.getItem('access_token');
         const formData = new FormData();
+        
+        // Agregar archivo - probar con diferentes nombres de campo comunes
         formData.append('file', this.archivoSeleccionado);
-        formData.append('es_principal', this.imagenPrincipal);
-        formData.append('orden', this.imagenes.length);
+        formData.append('es_principal', this.imagenPrincipal ? 'true' : 'false');
+        formData.append('orden', (this.imagenes.length + 1).toString());
+        
+        // Debug: mostrar contenido del FormData
+        console.log('📦 FormData contenido:');
+        for (let [key, value] of formData.entries()) {
+          console.log(`   ${key}:`, value);
+        }
+        console.log('📦 Producto Codigo:', this.productoActual.codigo);
 
-        await axios.post(
-          `${API_BASE_URL}/images/upload/${this.productoActual.id}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
+        const response = await apiClient.post(`/images/upload/${this.productoActual.codigo}`,
+          formData
         );
+        
+        console.log('✅ Respuesta:', response.data);
 
         alert('Imagen subida correctamente');
         this.archivoSeleccionado = null;
         this.imagenPrincipal = false;
         this.$refs.fileInput.value = '';
-        await this.cargarImagenes(this.productoActual.id);
+        await this.cargarImagenes(this.productoActual.codigo);
       } catch (error) {
         console.error('Error al subir imagen:', error);
-        alert('Error al subir imagen: ' + (error.response?.data?.message || error.message));
+        console.error('Respuesta del servidor:', error.response?.data);
+        alert('Error al subir imagen: ' + (error.response?.data?.message || error.response?.data?.detail || error.message));
       } finally {
         this.subiendoImagen = false;
       }
     },
 
-    async marcarPrincipal(imagenId) {
+    async marcarPrincipal(imagen) {
       try {
         const token = localStorage.getItem('access_token');
-        await axios.put(
-          `${API_BASE_URL}/images/${imagenId}/principal`,
+        await apiClient.put(
+          `/images/${imagen.id}/principal`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        await this.cargarImagenes(this.productoActual.id);
+        await this.cargarImagenes(this.productoActual.codigo);
         alert('Imagen marcada como principal');
       } catch (error) {
         console.error('Error al marcar imagen principal:', error);
@@ -214,15 +321,12 @@ export default {
       }
     },
 
-    async eliminarImagen(imagenId) {
+    async eliminarImagen(imagen) {
       if (!confirm('¿Está seguro de eliminar esta imagen?')) return;
 
       try {
-        const token = localStorage.getItem('access_token');
-        await axios.delete(`${API_BASE_URL}/images/${imagenId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        await this.cargarImagenes(this.productoActual.id);
+        await apiClient.delete(`/images/${imagen.id}`);
+        await this.cargarImagenes(this.productoActual.codigo);
         alert('Imagen eliminada correctamente');
       } catch (error) {
         console.error('Error al eliminar imagen:', error);

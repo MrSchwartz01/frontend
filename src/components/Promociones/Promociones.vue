@@ -1,5 +1,5 @@
 <template>
-  <div class="promociones-layout">
+  <div class="page-layout">
     <HeaderAnth
       :searchQuery="searchQuery"
       :isAuthenticated="isAuthenticated"
@@ -7,70 +7,74 @@
       @cerrar-sesion="cerrarSesion"
     />
 
-    <section class="promo-hero">
-      <h1>Ofertas Exclusivas</h1>
-      <p>Equípate con lo mejor de la tecnología a precios imbatibles.</p>
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">Ofertas Exclusivas</h1>
+        <p class="hero-subtitle">Equípate con lo mejor de la tecnología a precios imbatibles.</p>
+      </div>
     </section>
 
-    <!-- Mensaje de carga -->
-    <div v-if="isLoading" class="mensaje-carga">
-      <p>Cargando promociones...</p>
-    </div>
+    <div class="content-container">
+      <!-- Mensaje de carga -->
+      <div v-if="isLoading" class="message-box info">
+        <p>Cargando promociones...</p>
+      </div>
 
-    <!-- Mensaje de error -->
-    <div v-if="errorMessage && !isLoading" class="mensaje-error">
-      <p>{{ errorMessage }}</p>
-      <button @click="cargarPromociones" class="btn-reintentar">Reintentar</button>
-    </div>
+      <!-- Mensaje de error -->
+      <div v-if="errorMessage && !isLoading" class="message-box error">
+        <p>{{ errorMessage }}</p>
+        <button @click="cargarPromociones" class="btn-primary" style="margin-top: 12px;">Reintentar</button>
+      </div>
 
-    <!-- Mensaje sin promociones -->
-    <div v-if="!isLoading && !errorMessage && promocionesActivas.length === 0" class="sin-promociones">
-      <p>No hay promociones activas en este momento.</p>
-      <p>¡Vuelve pronto para encontrar increíbles ofertas!</p>
-      <button @click="$router.push('/home')" class="btn-promo">Ver Productos</button>
-    </div>
+      <!-- Mensaje sin promociones -->
+      <div v-if="!isLoading && !errorMessage && promocionesActivas.length === 0" class="sin-promociones">
+        <p>No hay promociones activas en este momento.</p>
+        <p>¡Vuelve pronto para encontrar increíbles ofertas!</p>
+        <button @click="$router.push('/home')" class="btn-primary">Ver Productos</button>
+      </div>
 
-    <!-- Grid de promociones -->
-    <div v-if="!isLoading && promocionesActivas.length > 0" class="promociones-grid-container">
-      <div 
-        v-for="promo in promocionesActivas" 
-        :key="promo.id"
-        class="promo-card"
-        @click="verDetalleProducto(promo.producto.id)"
-        style="cursor: pointer;"
-      >
-        <div class="promo-badge">{{ promo.porcentaje_descuento }}% OFF</div>
-        <img
-            :src="obtenerImagenProducto(promo.producto)" 
-            :alt="promo.producto.nombre_producto" 
-            class="promo-img"
-            @error="manejarErrorImagen"
-          />
-        <div class="promo-info">
-          <h3>{{ promo.producto.nombre_producto }}</h3>
-          <p class="promo-descripcion">{{ promo.producto.descripcion || 'Oferta especial por tiempo limitado' }}</p>
-          
-          <!-- Precios -->
-          <div v-if="isAuthenticated" class="precios-container">
-            <div class="precio-original">
-              <span class="label-precio">Antes:</span>
-              <span class="valor-tachado">USD ${{ formatPrice(promo.producto.precio) }}</span>
+      <!-- Grid de promociones -->
+      <div v-if="!isLoading && promocionesActivas.length > 0" class="promociones-grid">
+        <div 
+          v-for="promo in promocionesActivas" 
+          :key="promo.id"
+          class="promo-card"
+          @click="verDetalleProducto(promo.producto.codigo)"
+          style="cursor: pointer;"
+        >
+          <div class="promo-badge">{{ promo.porcentaje_descuento }}% OFF</div>
+          <img
+              :src="obtenerImagenProducto(promo.producto)" 
+              :alt="promo.producto.producto" 
+              class="promo-img"
+              @error="manejarErrorImagen"
+            />
+          <div class="promo-info">
+            <h3>{{ promo.producto.producto }}</h3>
+            <p class="promo-descripcion">{{ promo.producto.medida || 'Oferta especial por tiempo limitado' }}</p>
+            
+            <!-- Precios -->
+            <div v-if="isAuthenticated" class="precios-container">
+              <div class="precio-original">
+                <span class="label-precio">Antes:</span>
+                <span class="valor-tachado">USD ${{ formatPrice(promo.producto.costoTotal) }}</span>
+              </div>
+              <div class="precio-promo">
+                <span class="label-precio">Ahora:</span>
+                <span class="valor-descuento">USD ${{ calcularPrecioConDescuento(promo.producto.costoTotal, promo.porcentaje_descuento) }}</span>
+              </div>
+              <div class="ahorro">
+                <span class="label-ahorro">Ahorras: USD ${{ calcularAhorro(promo.producto.costoTotal, promo.porcentaje_descuento) }}</span>
+              </div>
             </div>
-            <div class="precio-promo">
-              <span class="label-precio">Ahora:</span>
-              <span class="valor-descuento">USD ${{ calcularPrecioConDescuento(promo.producto.precio, promo.porcentaje_descuento) }}</span>
+            <div v-else class="login-mensaje">
+              <p>Inicia sesión para ver precios</p>
             </div>
-            <div class="ahorro">
-              <span class="label-ahorro">Ahorras: USD ${{ calcularAhorro(promo.producto.precio, promo.porcentaje_descuento) }}</span>
-            </div>
-          </div>
-          <div v-else class="login-mensaje">
-            <p>Inicia sesión para ver precios</p>
-          </div>
 
-          <!-- Validez de la promoción -->
-          <div class="validez-promo">
-            <small>Válido hasta: {{ formatearFecha(promo.fecha_fin) }}</small>
+            <!-- Validez de la promoción -->
+            <div class="validez-promo">
+              <small>Válido hasta: {{ formatearFecha(promo.fecha_fin) }}</small>
+            </div>
           </div>
         </div>
       </div>
@@ -81,8 +85,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 
@@ -111,7 +114,7 @@ export default {
       this.errorMessage = '';
       
       try {
-        const response = await axios.get(`${API_BASE_URL}/promociones/activas`);
+        const response = await apiClient.get('/promociones/activas');
         // Procesar las promociones para asignar la imagen correcta
         this.promocionesActivas = response.data.map(promo => ({
           ...promo,
@@ -135,7 +138,7 @@ export default {
         const imagenPrincipal = producto.productImages.find(img => img.es_principal);
         return imagenPrincipal ? imagenPrincipal.ruta_imagen : producto.productImages[0].ruta_imagen;
       }
-      return producto.imagen_url || '/Productos/placeholder-product.png';
+      return producto.imagen_url || '/placeholder_product.jpg';
     },
     
     verDetalleProducto(productoId) {
@@ -146,11 +149,15 @@ export default {
     },
     
     obtenerImagenProducto(producto) {
-      return producto.imagen_url || '/Productos/placeholder-product.png';
+      return producto.imagen_url || '/placeholder_product.jpg';
     },
     
     manejarErrorImagen(event) {
-      event.target.src = '/Productos/placeholder-product.png';
+      // Prevenir loop infinito: solo cambiar si no es ya el placeholder
+      if (!event.target.dataset.fallback) {
+        event.target.dataset.fallback = 'true';
+        event.target.src = '/placeholder_product.jpg';
+      }
     },
     
     formatPrice(price) {

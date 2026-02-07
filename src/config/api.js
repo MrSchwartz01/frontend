@@ -4,8 +4,8 @@
 
 // Detectar automáticamente si se está accediendo desde red local
 function getApiBaseUrl() {
-  // SIEMPRE usar la URL absoluta de Railway para evitar problemas de URL relativas
-  const backendUrl = 'https://chpc-webpage-back.vercel.app/api';
+  // URL por defecto para desarrollo local
+  const defaultUrl = 'http://45.88.188.111:5000/api';
   
   // Si hay variable de entorno definida, usarla (debe ser una URL completa)
   if (process.env.VUE_APP_API_URL) {
@@ -14,13 +14,13 @@ function getApiBaseUrl() {
     if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
       return envUrl;
     }
-    // Si la variable de entorno no es una URL completa, usar backend de Vercel como fallback
-    console.warn('VUE_APP_API_URL no es una URL completa, usando backend de Vercel como fallback');
-    return backendUrl;
+    // Si la variable de entorno no es una URL completa, usar URL por defecto como fallback
+    console.warn('VUE_APP_API_URL no es una URL completa, usando fallback');
+    return defaultUrl;
   }
   
-  // En cualquier otro caso, usar backend de Vercel
-  return backendUrl;
+  // En cualquier otro caso, usar URL por defecto
+  return defaultUrl;
 }
 
 const API_BASE_URL = getApiBaseUrl();

@@ -124,8 +124,9 @@ export default {
       this.cargando = true;
       try {
         const token = localStorage.getItem('access_token');
+        const apiUrl = process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
         const response = await axios.get(
-          `http://localhost:5000/analytics/productos/top?limite=${this.limite}`,
+          `${apiUrl}/analytics/productos/top?limite=${this.limite}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         

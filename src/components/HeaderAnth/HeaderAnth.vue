@@ -1,6 +1,6 @@
 <template>
     <transition name="fade">
-      <header v-bind:class="{ 'fade-in': isVisible }" class="header">
+      <header v-show="true" v-bind:class="{ 'fade-in': isVisible }" class="header">
         <div class="main-header">
           <!-- Logo -->
           <div class="logo">
@@ -16,6 +16,7 @@
               v-model="localSearchQuery"
               placeholder="¿Qué estás buscando hoy?"
               @input="onInput"
+              @keyup.enter="buscarProductos"
               @focus="programarCargaSugerencias"
               @blur="cerrarSugerencias"
               aria-label="Buscar productos"
@@ -109,28 +110,7 @@
         <nav class="main-menu">
           <ul>
             <li><a href="/home">Inicio</a></li>
-            <li 
-              class="dropdown-menu"
-              @mouseenter="showProductsMenu = true"
-              @mouseleave="showProductsMenu = false"
-              @dblclick="goToCategorias"
-            >
-                <a href="#" @click.prevent>Productos</a>
-                <transition name="dropdown-fade">
-                  <div v-if="showProductsMenu" class="dropdown-wrapper">
-                  <ul class="dropdown-content">
-                    <li class="divider"></li>
-                    <li><a href="/productos/categoria/laptops">Laptops</a></li>
-                    <li><a href="/productos/categoria/componentes">Componentes</a></li>
-                    <li><a href="/productos/categoria/perifericos">Periféricos</a></li>
-                    <li><a href="/productos/categoria/almacenamiento">Almacenamiento</a></li>
-                    <li><a href="/productos/categoria/redes">Redes</a></li>
-                    <li><a href="/productos/categoria/audio">Audio</a></li>
-                    <li><a href="/productos/categoria/redes">Equipos de Red</a></li>
-                  </ul>
-                  </div>  
-                </transition>
-              </li> 
+            <li><a href="/productos">Productos</a></li>
             <li><a href="/promociones">Promociones</a></li>
             <li 
               class="dropdown-menu"
@@ -141,18 +121,14 @@
               <a href="#" @click.prevent>Marcas</a>
               <transition name="dropdown-fade">
                 <div v-if="showMarcasMenu" class="dropdown-wrapper">
-                <ul class="dropdown-content">
-                  <li class="ver-todos-item"><a href="/marcas"><strong>Ver Todas las Marcas</strong></a></li>
-                  <li class="divider"></li>
-                  <li v-if="marcasDisponibles.length === 0" style="padding: 4px 12px; color: #999; font-size: 12px;">
-                    Cargando marcas...
-                  </li>
-                  <li v-for="marca in marcasDisponibles" :key="marca" class="marca-item">
-                    <a :href="`/productos/marca/${marca}`">
-                      <span class="marca-nombre">{{ marca }}</span>
-                    </a>
-                  </li>
-                </ul>
+                  <ul class="dropdown-content">
+                    <li v-if="marcasDisponibles.length === 0" style="padding: 8px 12px; color: #999; font-size: 12px;">
+                      Cargando marcas...
+                    </li>
+                    <li v-for="marca in marcasDisponibles" :key="marca">
+                      <a :href="`/productos/marca/${marca}`">{{ marca }}</a>
+                    </li>
+                  </ul>
                 </div>
               </transition>
             </li>

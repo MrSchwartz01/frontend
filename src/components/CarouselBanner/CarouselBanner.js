@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from '@/services/api';
 
 export default {
   name: "CarouselBanner",
@@ -37,7 +37,8 @@ export default {
       if (this.intervalId) clearInterval(this.intervalId);
     },
     getFullImageUrl(relativeUrl) {
-      return `http://192.168.2.117:5000${relativeUrl}`;
+      const baseUrl = process.env.VUE_APP_API_URL?.replace('/api', '') || '';
+      return `${baseUrl}${relativeUrl}`;
     },
     prevBanner() {
       this.activeBanner =

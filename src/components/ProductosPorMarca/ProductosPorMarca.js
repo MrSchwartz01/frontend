@@ -1,8 +1,7 @@
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
-import axios from "axios";
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 
 export default {
   name: "ProductosPorMarca",
@@ -58,20 +57,17 @@ export default {
       this.isAuthenticated = false;
       this.$router.replace("/login");
     },
-    verDetalle(id) {
-      this.$router.push({ name: "ProductoDetalle", params: { id } });
+    verDetalle(codigo) {
+      this.$router.push({ name: "ProductoDetalle", params: { id: codigo } });
     },
     async cargarProductosPorMarca(marca) {
       try {
         this.cargando = true;
         this.error = null;
         
-        const response = await axios.get(
-          `${API_BASE_URL}/tienda/productos`,
-          {
-            params: { marca: marca }
-          }
-        );
+        const response = await apiClient.get('/tienda/productos', {
+          params: { marca: marca }
+        });
         
         this.productos = response.data;
         
@@ -93,6 +89,13 @@ export default {
         return `${stock} unidades - Quedan pocas unidades`;
       } else {
         return 'Disponible';
+      }
+    },
+    handleImageError(event) {
+      // Prevenir loop infinito: solo cambiar si no es ya el placeholder
+      if (!event.target.dataset.fallback) {
+        event.target.dataset.fallback = 'true';
+        event.target.src = '/placeholder_product.jpg';
       }
     },
   },

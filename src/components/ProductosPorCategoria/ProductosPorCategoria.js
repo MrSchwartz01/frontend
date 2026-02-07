@@ -1,8 +1,7 @@
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
-import axios from "axios";
-import { API_BASE_URL } from '@/config/api';
+import apiClient from '@/services/api';
 
 export default {
   name: "ProductosPorCategoria",
@@ -81,18 +80,18 @@ export default {
     async cargarProductos(categoria) {
       try {
         console.log('🔍 [DEBUG] Categoría slug recibida:', categoria);
-        console.log('🔍 [DEBUG] categoriasInfo disponibles:', Object.keys(this.categoriasInfo));
         
-        // Obtener el nombre de categoría formateado del mapping
+        // Obtener el nombre de categoría formateado del mapping (ahora buscaremos por marca)
         const categoriaFormateada = this.categoriasInfo[categoria] || 
           categoria.charAt(0).toUpperCase() + categoria.slice(1);
         
-        console.log('📦 [DEBUG] Categoría formateada para buscar:', categoriaFormateada);
+        console.log('📦 [DEBUG] Buscando por marca:', categoriaFormateada);
         
-        const url = `${API_BASE_URL}/tienda/productos?categoria=${categoriaFormateada}`;
+        // Ahora buscamos por marca ya que el nuevo esquema no tiene categoría
+        const url = `/tienda/productos?marca=${encodeURIComponent(categoriaFormateada)}`;
         console.log('🌐 [DEBUG] URL de petición:', url);
         
-        const response = await axios.get(url);
+        const response = await apiClient.get(url);
         
         console.log('✅ [DEBUG] Respuesta del servidor:', {
           status: response.status,
@@ -110,11 +109,13 @@ export default {
         console.log(`✅ Productos cargados para ${categoriaFormateada}:`, this.productos.length);
         
         if (this.productos.length === 0) {
-          console.warn('⚠️ No se encontraron productos para esta categoría');
-          // Intentar cargar TODOS los productos para ver qué categorías existen
-          const todosResponse = await axios.get(`${API_BASE_URL}/tienda/productos`);
-          const categoriasExistentes = [...new Set(todosResponse.data.map(p => p.categoria))];
-          console.log('📋 Categorías disponibles en la BD:', categoriasExistentes);
+          console.warn('⚠️ No se encontraron productos para esta marca');
+          // Intentar cargar TODOS los productos para ver qué marcas existen
+          const todosResponse = await apiClient.get('/tienda/productos');
+          // La API devuelve { data: [...], total, page, limit, totalPages }
+          const todosProductos = todosResponse.data.data || todosResponse.data;
+          const marcasExistentes = [...new Set(todosProductos.map(p => p.marca))];
+          console.log('📋 Marcas disponibles en la BD:', marcasExistentes);
         }
       } catch (error) {
         console.error("❌ Error al cargar productos:", error);
@@ -128,8 +129,8 @@ export default {
     toggleSection(section) {
       this.sectionsOpen[section] = !this.sectionsOpen[section];
     },
-    verDetalle(id) {
-      this.$router.push({ name: "ProductoDetalle", params: { id } });
+    verDetalle(codigo) {
+      this.$router.push({ name: "ProductoDetalle", params: { id: codigo } });
     },
     obtenerTextoStock(stock) {
       if (stock === 0) {

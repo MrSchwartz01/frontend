@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '@/services/api';
 import { API_BASE_URL } from '@/config/api';
 
 export default {
@@ -32,7 +32,7 @@ export default {
       this.loading = true;
       try {
         const token = localStorage.getItem('access_token');
-        const response = await axios.get(`${API_BASE_URL}/notifications`, {
+        const response = await apiClient.get('/notifications', {
           headers: { Authorization: `Bearer ${token}` },
         });
         
@@ -52,8 +52,7 @@ export default {
     async markAllAsRead() {
       try {
         const token = localStorage.getItem('access_token');
-        await axios.post(
-          `${API_BASE_URL}/notifications/mark-all-read`,
+        await apiClient.post('/notifications/mark-all-read',
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -70,8 +69,7 @@ export default {
     async markAsRead(notificationId) {
       try {
         const token = localStorage.getItem('access_token');
-        await axios.patch(
-          `${API_BASE_URL}/notifications/${notificationId}/read`,
+        await apiClient.patch('/notifications/${notificationId}/read',
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -115,6 +113,15 @@ export default {
       const token = localStorage.getItem('access_token');
       if (!token) return;
 
+      // TEMPORALMENTE DESACTIVADO - El endpoint /notifications/stream no existe en el backend
+      // TODO: Reactivar cuando se implemente el endpoint de notificaciones en tiempo real
+      const streamEnabled = false;
+      
+      if (!streamEnabled) {
+        console.log('Stream de notificaciones desactivado temporalmente');
+        return;
+      }
+      
       // Crear EventSource con headers de autenticación
       // Nota: EventSource no soporta headers personalizados directamente
       // Pasamos el token en la URL como alternativa
