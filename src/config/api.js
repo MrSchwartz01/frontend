@@ -5,7 +5,7 @@
 function getApiBaseUrl() {
   // En desarrollo, usar localhost
   if (process.env.NODE_ENV === 'development') {
-    return process.env.VUE_APP_API_URL || 'http://localhost:5000/api';
+    return process.env.VUE_APP_API_URL || 'http://45.88.188.111:5000/api';
   }
   
   // En producción con nginx proxy (RECOMENDADO)
@@ -16,7 +16,7 @@ function getApiBaseUrl() {
   
   // En producción sin proxy (usar URL completa de Dokploy)
   // IMPORTANTE: Reemplaza esto con tu URL real del backend
-  return process.env.VUE_APP_API_URL || 'https://chpc-backend-mrdcx4-0db854-45-88-188-111.traefik.me/api';
+  return process.env.VUE_APP_API_URL || 'http://chpc-backend-mrdcx4-0db854-45-88-188-111.traefik.me/api';
 }
 
 const API_BASE_URL = getApiBaseUrl();
