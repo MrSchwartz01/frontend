@@ -18,9 +18,10 @@ RUN npm install --legacy-peer-deps
 # Copiar código fuente
 COPY . .
 
-# Argumentos de build para variables de entorno
-ARG VUE_APP_API_URL
-ENV VUE_APP_API_URL=${VUE_APP_API_URL}
+# Variables de entorno para build
+# Usar proxy en nginx (URL relativa /api)
+ENV VUE_APP_API_PROXY=true
+ENV VUE_APP_API_URL=/api
 
 # Desactivar errores de ESLint durante build
 ENV CI=false
