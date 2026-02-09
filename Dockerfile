@@ -19,9 +19,12 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Variables de entorno para build
-# Usar proxy en nginx (URL relativa /api)
-ENV VUE_APP_API_PROXY=true
-ENV VUE_APP_API_URL=/api
+# En Dokploy: usar URL directa al backend (NO proxy nginx)
+# Estas se pueden sobreescribir con build args en Dokploy
+ARG VUE_APP_API_URL=https://chpc-backend-mrdcx4-0db854-45-88-188-111.traefik.me/api
+ARG VUE_APP_API_PROXY=false
+ENV VUE_APP_API_PROXY=$VUE_APP_API_PROXY
+ENV VUE_APP_API_URL=$VUE_APP_API_URL
 
 # Desactivar errores de ESLint durante build
 ENV CI=false
@@ -42,9 +45,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # Exponer puerto
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
+# Health check - usar curl que viene en nginx:alpine
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
 
 # Comando de inicio
 CMD ["nginx", "-g", "daemon off;"]
