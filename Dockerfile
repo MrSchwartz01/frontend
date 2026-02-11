@@ -46,7 +46,8 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 
 # Health check - wget viene por defecto en nginx:alpine
-HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+# start-period aumentado para dar tiempo al contenedor en entornos con recursos limitados
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=5 \
     CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
 
 # Comando de inicio
