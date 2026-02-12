@@ -22,6 +22,10 @@ RUN echo "🔨 Iniciando build..." && \
 
 # --- Etapa de producción ---
 FROM nginx:alpine AS production
+
+# Instalar curl para el healthcheck (wget no está en nginx:alpine)
+RUN apk add --no-cache curl
+
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
@@ -30,7 +34,9 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 RUN nginx -t
 
 EXPOSE 80
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
 
-CMD ["sh", "-c", "echo '🚀 Iniciando Nginx...' && nginx -g 'daemon off;'"]
+# Healthcheck usando curl (disponible tras instalación)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]
