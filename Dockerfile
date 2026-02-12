@@ -30,8 +30,14 @@ ENV VUE_APP_API_URL=$VUE_APP_API_URL
 ENV CI=false
 ENV NODE_ENV=production
 
-# Construir la aplicación
-RUN npm run build
+# Construir la aplicación con logging mejorado
+RUN echo "🔨 Iniciando build de Vue.js..." && \
+    npm run build && \
+    echo "✅ Build completado" && \
+    ls -la dist/ && \
+    echo "📁 Verificando archivos críticos..." && \
+    test -f dist/index.html || (echo "❌ ERROR: index.html no generado" && exit 1) && \
+    echo "✅ Verificación completada"
 
 # --- Etapa de producción con Nginx ---
 FROM nginx:alpine AS production
@@ -42,14 +48,23 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Copiar archivos estáticos desde la etapa de build
 COPY --from=builder /app/dist /usr/share/nginx/html
 
+# Verificar que los archivos se copiaron correctamente
+RUN echo "📦 Verificando archivos copiados..." && \
+    ls -la /usr/share/nginx/html && \
+    test -f /usr/share/nginx/html/index.html || (echo "❌ ERROR: index.html no encontrado" && exit 1) && \
+    echo "✅ Archivos verificados correctamente"
+
+# Verificar configuración de nginx
+RUN nginx -t
+
 # Exponer puerto
 EXPOSE 80
 
-# Health check - wget viene por defecto en nginx:alpine
-# start-period aumentado para dar tiempo al contenedor en entornos con recursos limitados
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=5 \
+# Health check mejorado con más tiempo de inicio
+# start-period aumentado a 60s para entornos con recursos limitados
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
 
-# Comando de inicio
-CMD ["nginx", "-g", "daemon off;"]
+# Comando de inicio con logging
+CMD ["sh", "-c", "echo '🚀 Iniciando Nginx para CHPC Frontend...' && nginx -g 'daemon off;'"]
     
