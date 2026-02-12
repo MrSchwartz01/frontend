@@ -34,10 +34,11 @@ RUN nginx -t
 
 EXPOSE 80
 
-# HEALTHCHECK desactivado temporalmente para diagnóstico
-# Si Dokploy requiere healthcheck, descomentar después de verificar que el contenedor inicia
-# HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
-#     CMD curl -f http://localhost/ || exit 1
+# HEALTHCHECK reactivado y ajustado para ser más tolerante
+# Dokploy puede requerir un healthcheck para marcar el despliegue como exitoso.
+# Le damos 2 minutos (120s) antes del primer chequeo.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+    CMD curl -f http://localhost/ || exit 1
 
 # Comando de inicio - nginx en primer plano
 CMD ["nginx", "-g", "daemon off;"]
