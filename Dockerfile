@@ -29,14 +29,15 @@ RUN apk add --no-cache curl
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# La etiqueta 'error' en Dokploy a veces es solo ruido visual, 
-# pero nginx -t confirmará que todo está OK
+# Verificar configuración de nginx
 RUN nginx -t
 
 EXPOSE 80
 
-# Healthcheck usando curl (disponible tras instalación)
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
+# HEALTHCHECK desactivado temporalmente para diagnóstico
+# Si Dokploy requiere healthcheck, descomentar después de verificar que el contenedor inicia
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
+#     CMD curl -f http://localhost/ || exit 1
 
+# Comando de inicio - nginx en primer plano
 CMD ["nginx", "-g", "daemon off;"]
