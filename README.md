@@ -2,6 +2,11 @@
 
 Frontend de la aplicación CHPC construido con Vue.js 3 y desplegado con Docker + Nginx.
 
+> ⚠️ **IMPORTANTE**: Este proyecto usa **Docker Standalone** con Dokploy, NO Docker Swarm.  
+> Ver: [DOKPLOY_STANDALONE_CONFIG.md](./DOKPLOY_STANDALONE_CONFIG.md)
+
+---
+
 ## 🚀 Desarrollo Local
 
 ### Project setup

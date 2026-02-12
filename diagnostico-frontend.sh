@@ -10,7 +10,31 @@ echo ""
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# 0. Verificar que NO es Docker Swarm
+echo "0️⃣ Verificando modo Docker..."
+SWARM_STATUS=$(docker info 2>/dev/null | grep "Swarm:" | awk '{print $2}')
+if [ "$SWARM_STATUS" == "active" ]; then
+    echo -e "${RED}❌ ADVERTENCIA: Docker Swarm está ACTIVO${NC}"
+    echo -e "${YELLOW}⚠️  Este proyecto NO debe usar Swarm. Usa contenedores standalone.${NC}"
+    echo -e "${YELLOW}⚠️  Revisa: DOKPLOY_STANDALONE_CONFIG.md${NC}"
+    echo ""
+else
+    echo -e "${GREEN}✅ Docker en modo standalone (correcto)${NC}"
+fi
+
+# Verificar servicios de Swarm
+SERVICES=$(docker service ls 2>/dev/null | wc -l)
+if [ "$SERVICES" -gt 1 ]; then
+    echo -e "${RED}❌ Se encontraron servicios de Swarm:${NC}"
+    docker service ls
+    echo -e "${YELLOW}⚠️  No deberían existir. Este proyecto usa contenedores standalone.${NC}"
+else
+    echo -e "${GREEN}✅ No hay servicios de Swarm (correcto)${NC}"
+fi
+echo ""
 
 # 1. Verificar si la imagen existe
 echo "1️⃣ Verificando imagen..."

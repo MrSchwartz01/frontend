@@ -1,5 +1,5 @@
 # Dockerfile para Frontend Vue.js - CHPC
-# Optimizado para Dokploy
+# Optimizado para Dokploy con Docker Standalone (NO Swarm)
 
 # --- Etapa de build ---
 FROM node:18-alpine AS builder

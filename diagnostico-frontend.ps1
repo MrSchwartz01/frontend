@@ -28,11 +28,31 @@ if (!(Get-Command ssh -ErrorAction SilentlyContinue)) {
 
 # Script que se ejecutará en el servidor remoto
 $RemoteScript = @'
-echo "1️⃣ Verificando imagen..."
+echo "1️⃣ Verificando modo Docker..."
+SWARM_STATUS=$(docker info 2>/dev/null | grep "Swarm:" | awk '{print $2}')
+if [ "$SWARM_STATUS" == "active" ]; then
+    echo "❌ ADVERTENCIA: Docker Swarm está ACTIVO"
+    echo "⚠️  Este proyecto NO debe usar Swarm"
+    echo "⚠️  Revisa: DOKPLOY_STANDALONE_CONFIG.md"
+else
+    echo "✅ Docker en modo standalone (correcto)"
+fi
+
+# Verificar servicios de Swarm
+SERVICE_COUNT=$(docker service ls 2>/dev/null | tail -n +2 | wc -l)
+if [ "$SERVICE_COUNT" -gt 0 ]; then
+    echo "❌ Se encontraron $SERVICE_COUNT servicios de Swarm"
+    docker service ls
+else
+    echo "✅ No hay servicios de Swarm (correcto)"
+fi
+echo ""
+
+echo "2️⃣ Verificando imagen..."
 docker images | grep "chpc-frontend" || echo "No se encontró imagen"
 echo ""
 
-echo "2️⃣ Buscando contenedores..."
+echo "3️⃣ Buscando contenedores..."
 docker ps -a | grep "chpc-frontend" || echo "No hay contenedores"
 echo ""
 
@@ -50,20 +70,20 @@ fi
 echo "📦 Contenedor ID: $CONTAINER_ID"
 echo ""
 
-echo "3️⃣ Estado del contenedor:"
+echo "4️⃣ Estado del contenedor:"
 docker inspect $CONTAINER_ID --format='Estado: {{.State.Status}} | Health: {{.State.Health.Status}}' 2>/dev/null
 echo ""
 
-echo "4️⃣ Últimos 20 logs:"
+echo "5️⃣ Últimos 20 logs:"
 echo "-----------------------------------"
 docker logs --tail 20 $CONTAINER_ID 2>&1
 echo ""
 
-echo "5️⃣ Verificando archivos en el contenedor:"
+echo "6️⃣ Verificando archivos en el contenedor:"
 docker exec $CONTAINER_ID ls -la /usr/share/nginx/html 2>/dev/null || echo "No se pudo acceder"
 echo ""
 
-echo "6️⃣ Intentando acceder a nginx:"
+echo "7️⃣ Intentando acceder a nginx:"
 docker exec $CONTAINER_ID wget -O- http://localhost 2>/dev/null | head -5 || echo "Nginx no responde"
 echo ""
 

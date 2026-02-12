@@ -1,5 +1,14 @@
 # 🔍 Diagnóstico - Contenedor Frontend No Inicia
 
+## ⚠️ IMPORTANTE: Este proyecto NO usa Docker Swarm
+
+Este proyecto utiliza **contenedores Docker standalone** gestionados por Dokploy.  
+**NO debe** tener configuraciones de Docker Swarm, servicios, replicas, o stacks.
+
+➡️ **Si encuentras configuraciones de Swarm, revisa**: [DOKPLOY_STANDALONE_CONFIG.md](./DOKPLOY_STANDALONE_CONFIG.md)
+
+---
+
 ## Estado Actual
 - ✅ Imagen existe: `chpc-frontend-rrp6aj:latest`
 - ❌ Contenedor no está corriendo
@@ -12,6 +21,13 @@
 Conéctate al servidor y ejecuta estos comandos para diagnosticar:
 
 ```bash
+# 0. Verificar que NO es Docker Swarm (IMPORTANTE)
+docker info | grep Swarm
+# Debe mostrar: "Swarm: inactive"
+
+docker service ls
+# Debe dar error o mostrar vacío
+
 # 1. Ver si hay un contenedor detenido del frontend
 docker ps -a | grep frontend
 
