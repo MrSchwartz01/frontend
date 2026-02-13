@@ -10,13 +10,14 @@ RUN npm install --legacy-peer-deps
 
 COPY . .
 
-# Argumentos que Dokploy inyectará
+# Argumentos que Easypanel/Dokploy inyectará
 ARG VUE_APP_API_URL
 ENV VUE_APP_API_URL=$VUE_APP_API_URL
 ENV CI=false
 ENV NODE_ENV=production
 
 RUN echo "🔨 Iniciando build..." && \
+    echo "📡 VUE_APP_API_URL: $VUE_APP_API_URL" && \
     npm run build && \
     echo "✅ Build completado"
 
