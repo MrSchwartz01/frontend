@@ -27,4 +27,39 @@ console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
 console.log('🔧 VUE_APP_API_URL:', process.env.VUE_APP_API_URL);
 console.log('🔧 VUE_APP_API_PROXY:', process.env.VUE_APP_API_PROXY);
 
-export { API_BASE_URL };
+/**
+ * Convierte una ruta de imagen relativa a una URL completa del backend
+ * @param {string} imagePath - Ruta de la imagen (puede ser relativa o absoluta)
+ * @returns {string} URL completa de la imagen
+ */
+function getImageUrl(imagePath) {
+  // Si no hay ruta o es placeholder, devolver placeholder
+  if (!imagePath || imagePath.includes('placeholder')) {
+    return '/Productos/placeholder-product.png';
+  }
+  
+  // Si ya es una URL completa (http/https), devolverla tal cual
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // Si la ruta empieza con /uploads/, construir URL completa del backend
+  if (imagePath.startsWith('/uploads/')) {
+    // Remover /api del final de API_BASE_URL si existe
+    const baseUrl = API_BASE_URL.replace(/\/api$/, '');
+    return `${baseUrl}${imagePath}`;
+  }
+  
+  // Si es una ruta vieja que empieza con /Productos/, convertir
+  if (imagePath.startsWith('/Productos/')) {
+    const baseUrl = API_BASE_URL.replace(/\/api$/, '');
+    const fileName = imagePath.replace('/Productos/', '');
+    return `${baseUrl}/uploads/productos/${fileName}`;
+  }
+  
+  // Para cualquier otra ruta, asumir que es un nombre de archivo
+  const baseUrl = API_BASE_URL.replace(/\/api$/, '');
+  return `${baseUrl}/uploads/productos/${imagePath}`;
+}
+
+export { API_BASE_URL, getImageUrl };

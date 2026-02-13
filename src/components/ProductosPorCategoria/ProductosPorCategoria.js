@@ -2,6 +2,7 @@ import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
 import apiClient from '@/services/api';
+import { getImageUrl } from '@/config/api';
 
 export default {
   name: "ProductosPorCategoria",
@@ -99,12 +100,21 @@ export default {
           primerProducto: response.data[0]
         });
         
-        this.productos = response.data.map(producto => ({
-          ...producto,
-          imagen_url: producto.productImages?.length > 0
-            ? producto.productImages.find(img => img.es_principal)?.ruta_imagen || producto.productImages[0].ruta_imagen
-            : producto.imagen_url || "/Productos/placeholder-product.png"
-        }));
+        this.productos = response.data.map(producto => {
+          // Obtener la ruta de la imagen (principal o primera disponible)
+          let rutaImagen = '/Productos/placeholder-product.png';
+          if (producto.productImages?.length > 0) {
+            const imagenPrincipal = producto.productImages.find(img => img.es_principal);
+            rutaImagen = imagenPrincipal?.ruta_imagen || producto.productImages[0].ruta_imagen;
+          } else if (producto.imagen_url) {
+            rutaImagen = producto.imagen_url;
+          }
+          
+          return {
+            ...producto,
+            imagen_url: getImageUrl(rutaImagen)
+          };
+        });
         
         console.log(`✅ Productos cargados para ${categoriaFormateada}:`, this.productos.length);
         

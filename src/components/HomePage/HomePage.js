@@ -1,4 +1,5 @@
 import apiClient from '@/services/api';
+import { getImageUrl } from '@/config/api';
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import CarouselBanner from "../CarouselBanner/CarouselBanner.vue";
@@ -110,13 +111,23 @@ export default {
       const productosResponse = await apiClient.get('/tienda/productos');
       // La API devuelve { data: [...], total, page, limit, totalPages }
       const productosArray = productosResponse.data.data || productosResponse.data;
-      this.productos = productosArray.map((producto) => ({
-        ...producto,
-        imagen_url:
-          producto.media?.length > 0
-            ? `${process.env.VUE_APP_API_URL?.replace('/api', '') || ''}${producto.media[0].url}`
-            : producto.imagen_url || "/placeholder_product.jpg",
-      }));
+      this.productos = productosArray.map((producto) => {
+        // Obtener la ruta de la imagen (principal o primera disponible)
+        let rutaImagen = '/Productos/placeholder-product.png';
+        if (producto.productImages?.length > 0) {
+          const imagenPrincipal = producto.productImages.find(img => img.es_principal);
+          rutaImagen = imagenPrincipal?.ruta_imagen || producto.productImages[0].ruta_imagen;
+        } else if (producto.media?.length > 0) {
+          rutaImagen = producto.media[0].url;
+        } else if (producto.imagen_url) {
+          rutaImagen = producto.imagen_url;
+        }
+        
+        return {
+          ...producto,
+          imagen_url: getImageUrl(rutaImagen)
+        };
+      });
       
       console.log('Total de productos cargados:', this.productos.length);
       console.log('Ejemplo de producto:', this.productos[0]);

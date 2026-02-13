@@ -1,4 +1,5 @@
 import apiClient from '@/services/api';
+import { getImageUrl } from '@/config/api';
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
@@ -30,8 +31,8 @@ export default {
   computed: {
     imagenPrincipal() {
       if (this.imagenes && this.imagenes.length > 0) {
-        // Usar el índice actual del carousel
-        return this.imagenes[this.currentImageIndex].ruta_imagen;
+        // Usar el índice actual del carousel y construir URL completa
+        return getImageUrl(this.imagenes[this.currentImageIndex].ruta_imagen);
       }
       return '/placeholder_product.jpg';
     },
@@ -95,7 +96,12 @@ export default {
         // Cargar imágenes del producto
         try {
           const imagenesResponse = await apiClient.get(`/images/producto/${productoCodigo}`);
-          this.imagenes = imagenesResponse.data;
+          // Transformar las rutas de imágenes a URLs completas
+          this.imagenes = imagenesResponse.data.map(img => ({
+            ...img,
+            // Guardar la URL completa en una propiedad separada si es necesario para el template
+            ruta_imagen: img.ruta_imagen // Mantener la ruta original, getImageUrl la convertirá
+          }));
         } catch (imgError) {
           console.warn('No se pudieron cargar las imágenes:', imgError);
           this.imagenes = [];
@@ -133,9 +139,23 @@ export default {
         
         console.log('Productos obtenidos:', response.data.length);
         
-        // Filtrar el producto actual y limitar a 3
+        // Filtrar el producto actual, mapear imágenes y limitar a 3
         this.productosRelacionados = response.data
           .filter(p => p.codigo !== this.producto.codigo)
+          .map(producto => {
+            let rutaImagen = '/Productos/placeholder-product.png';
+            if (producto.productImages?.length > 0) {
+              const imagenPrincipal = producto.productImages.find(img => img.es_principal);
+              rutaImagen = imagenPrincipal?.ruta_imagen || producto.productImages[0].ruta_imagen;
+            } else if (producto.imagen_url) {
+              rutaImagen = producto.imagen_url;
+            }
+            
+            return {
+              ...producto,
+              imagen_url: getImageUrl(rutaImagen)
+            };
+          })
           .slice(0, 3);
           
         console.log('Productos relacionados filtrados:', this.productosRelacionados.length);

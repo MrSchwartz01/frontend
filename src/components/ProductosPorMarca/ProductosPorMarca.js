@@ -2,6 +2,7 @@ import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
 import apiClient from '@/services/api';
+import { getImageUrl } from '@/config/api';
 
 export default {
   name: "ProductosPorMarca",
@@ -69,7 +70,21 @@ export default {
           params: { marca: marca }
         });
         
-        this.productos = response.data;
+        // Mapear productos y construir URLs completas de imágenes
+        this.productos = response.data.map(producto => {
+          let rutaImagen = '/Productos/placeholder-product.png';
+          if (producto.productImages?.length > 0) {
+            const imagenPrincipal = producto.productImages.find(img => img.es_principal);
+            rutaImagen = imagenPrincipal?.ruta_imagen || producto.productImages[0].ruta_imagen;
+          } else if (producto.imagen_url) {
+            rutaImagen = producto.imagen_url;
+          }
+          
+          return {
+            ...producto,
+            imagen_url: getImageUrl(rutaImagen)
+          };
+        });
         
         if (this.productos.length === 0) {
           this.error = `No se encontraron productos de la marca ${marca}`;
