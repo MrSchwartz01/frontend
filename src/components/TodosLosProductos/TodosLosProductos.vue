@@ -189,7 +189,7 @@
                   </button>
                 </div>
               </div>
-            n</div>
+            </div>
           </div>
 
           <!-- Paginación -->
