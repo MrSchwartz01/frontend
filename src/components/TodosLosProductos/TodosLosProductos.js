@@ -3,6 +3,7 @@ import FooterAnth from '../FooterAnth/FooterAnth.vue';
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
 import apiClient from '@/services/api';
 import authService from '@/services/auth';
+import { getImageUrl } from '@/config/api';
 
 export default {
   name: 'TodosLosProductos',
@@ -101,7 +102,27 @@ export default {
         this.cargando = true;
         const response = await apiClient.get('/tienda/productos');
         // La API devuelve { data: [...], total, page, limit, totalPages }
-        this.productos = response.data.data || response.data;
+        const productosArray = response.data.data || response.data;
+        
+        // Procesar imágenes de productos igual que en HomePage
+        this.productos = productosArray.map((producto) => {
+          // Obtener la ruta de la imagen (principal o primera disponible)
+          let rutaImagen = '/Productos/placeholder-product.png';
+          if (producto.productImages?.length > 0) {
+            const imagenPrincipal = producto.productImages.find(img => img.es_principal);
+            rutaImagen = imagenPrincipal?.ruta_imagen || producto.productImages[0].ruta_imagen;
+          } else if (producto.media?.length > 0) {
+            rutaImagen = producto.media[0].url;
+          } else if (producto.imagen_url) {
+            rutaImagen = producto.imagen_url;
+          }
+          
+          return {
+            ...producto,
+            imagen_url: getImageUrl(rutaImagen)
+          };
+        });
+        
         this.productosFiltrados = [...this.productos];
         
         this.extraerOpcionesFiltros();

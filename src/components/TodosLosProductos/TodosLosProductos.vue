@@ -152,6 +152,7 @@
               v-for="producto in productosPaginados"
               :key="producto.codigo"
               class="producto-card"
+              @click="verDetalle(producto.codigo)"
             >
               <div class="producto-imagen">
                 <img 
@@ -177,16 +178,13 @@
                   </p>
                 </div>
                 <div class="producto-acciones">
-                  <button @click="verDetalle(producto.codigo)" class="ver-btn">
-                    Ver Detalles
-                  </button>
                   <button 
                     v-if="parseInt(producto.existenciaTotal) > 0"
-                    @click="agregarAlCarrito(producto)" 
+                    @click.stop="agregarAlCarrito(producto)" 
                     class="agregar-btn"
                     title="Agregar al carrito"
                   >
-                    🛒
+                    🛒 Agregar
                   </button>
                 </div>
               </div>
