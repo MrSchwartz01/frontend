@@ -60,7 +60,7 @@
     </div>
 
     <!-- Lista de productos -->
-    <div v-if="cargando" class="loading">⏳ Cargando productos...</div>
+    <div v-if="cargando" class="loading">Cargando productos...</div>
 
     <div v-else class="productos-grid">
       <div

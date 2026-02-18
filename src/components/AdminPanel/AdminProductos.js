@@ -1,4 +1,5 @@
 import apiClient from '@/services/api';
+import { getImageUrl } from '@/config/api';
 
 export default {
   name: 'AdminProductos',
@@ -64,7 +65,14 @@ export default {
         const response = await apiClient.get('/tienda/productos/admin/todos');
         // La API devuelve { data: [...], total, page, limit, totalPages }
         // Mostrar todos los productos, incluso sin stock o sin precio
-        this.productos = response.data.data || response.data;
+        const productosArray = response.data.data || response.data;
+        
+        // Procesar URLs de imágenes para que funcionen correctamente
+        this.productos = productosArray.map(producto => ({
+          ...producto,
+          imagen_url: getImageUrl(producto.imagen_url)
+        }));
+        
         this.productosFiltrados = [...this.productos];
         this.extraerOpcionesFiltros();
       } catch (error) {
@@ -236,7 +244,11 @@ export default {
       try {
         this.cargandoImagenes = true;
         const response = await apiClient.get(`/images/producto/${productoCodigo}`);
-        this.imagenes = response.data;
+        // Procesar URLs de imágenes
+        this.imagenes = response.data.map(imagen => ({
+          ...imagen,
+          ruta_imagen: getImageUrl(imagen.ruta_imagen)
+        }));
       } catch (error) {
         console.error('Error al cargar imágenes:', error);
         this.imagenes = [];

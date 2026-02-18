@@ -454,6 +454,17 @@ export default {
           // Actualizar usuario (sin password)
           // eslint-disable-next-line no-unused-vars
           const { password, ...updateData } = this.userForm;
+          
+          // Limpiar campos vacíos para evitar problemas de validación
+          // Convertir strings vacíos a null
+          Object.keys(updateData).forEach(key => {
+            if (updateData[key] === '') {
+              updateData[key] = null;
+            }
+          });
+          
+          console.log('Datos a actualizar:', updateData);
+          
           await apiClient.patch(`/usuarios/${this.editingUser.id}`,
             updateData,
             this.getAuthHeaders()
@@ -475,10 +486,18 @@ export default {
         console.error('Response data:', error.response?.data);
         console.error('Response status:', error.response?.status);
         console.error('Response headers:', error.response?.headers);
-        this.showUserMessage(
-          error.response?.data?.message || 'Error al guardar el usuario',
-          'error'
-        );
+        
+        // Mostrar mensaje de error más detallado
+        let errorMsg = 'Error al guardar el usuario';
+        if (error.response?.data?.message) {
+          if (Array.isArray(error.response.data.message)) {
+            errorMsg = error.response.data.message.join(', ');
+          } else {
+            errorMsg = error.response.data.message;
+          }
+        }
+        
+        this.showUserMessage(errorMsg, 'error');
       }
     },
 
