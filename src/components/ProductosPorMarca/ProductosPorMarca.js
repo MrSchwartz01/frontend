@@ -47,12 +47,19 @@ export default {
         this.cargando = true;
         this.error = null;
         
+        console.log('Cargando productos para marca:', marca);
+        
         const response = await apiClient.get('/tienda/productos', {
           params: { marca: marca }
         });
         
+        console.log('Respuesta de la API:', response.data);
+        
+        // La API devuelve { data: [...], total, page, limit, totalPages }
+        const productosArray = response.data.data || response.data;
+        
         // Mapear productos y construir URLs completas de imágenes
-        this.productos = response.data.map(producto => {
+        this.productos = productosArray.map(producto => {
           let rutaImagen = '/Productos/placeholder-product.png';
           if (producto.productImages?.length > 0) {
             const imagenPrincipal = producto.productImages.find(img => img.es_principal);
@@ -66,6 +73,8 @@ export default {
             imagen_url: getImageUrl(rutaImagen)
           };
         });
+        
+        console.log('Productos cargados:', this.productos.length);
         
         if (this.productos.length === 0) {
           this.error = `No se encontraron productos de la marca ${marca}`;
