@@ -1,6 +1,7 @@
 import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
+import ProductImageCarousel from '../ProductImageCarousel/ProductImageCarousel.vue';
 import apiClient from '@/services/api';
 import { getImageUrl } from '@/config/api';
 
@@ -10,6 +11,7 @@ export default {
     HeaderAnth,
     FooterAnth,
     ContactoAsesor,
+    ProductImageCarousel,
   },
   data() {
     return {
@@ -105,6 +107,25 @@ export default {
       } else {
         return 'Disponible';
       }
+    },
+    getProductImages(producto) {
+      // Retornar array de imágenes del producto
+      if (producto.productImages && producto.productImages.length > 0) {
+        // Ordenar para que la imagen principal esté primero
+        const imagesSorted = [...producto.productImages].sort((a, b) => {
+          if (a.es_principal) return -1;
+          if (b.es_principal) return 1;
+          return 0;
+        });
+        return imagesSorted;
+      }
+      
+      // Fallback a imagen_url si no hay productImages
+      if (producto.imagen_url) {
+        return [producto.imagen_url];
+      }
+      
+      return [];
     },
     handleImageError(event) {
       // Prevenir loop infinito: solo cambiar si no es ya el placeholder

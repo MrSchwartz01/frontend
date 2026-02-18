@@ -27,14 +27,13 @@
               :key="producto.codigo"
               class="product-card"
             >
-              <div class="product-image">
-                <img
-                  :src="producto.imagen_url || '/placeholder_product.jpg'"
-                  :alt="producto.producto"
-                  loading="lazy"
-                  @error="handleImageError"
-                />
-              </div>
+              <ProductImageCarousel
+                :images="getProductImages(producto)"
+                :alt-text="producto.producto"
+                :auto-play="true"
+                :auto-play-interval="3000"
+                @click="verDetalle(producto.codigo)"
+              />
     <h3>{{ producto.producto }}</h3>
     <p>{{ producto.medida }}</p>
     <p class="precio">Precio: ${{ producto.costoTotal }}</p>

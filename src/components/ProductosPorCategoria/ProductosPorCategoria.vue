@@ -27,11 +27,12 @@
           :key="producto.codigo"
           class="producto-card"
         >
-          <img 
-            :src="producto.imagen_url" 
-            :alt="producto.producto" 
+          <ProductImageCarousel
+            :images="getProductImages(producto)"
+            :alt-text="producto.producto"
+            :auto-play="true"
+            :auto-play-interval="3000"
             @click="verDetalle(producto.codigo)"
-            style="cursor: pointer;"
           />
           <div class="producto-info">
             <span class="marca-tag">{{ producto.marca }}</span>

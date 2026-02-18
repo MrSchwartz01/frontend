@@ -87,19 +87,20 @@
     class="product-card"
     @click="verDetalle(producto.codigo)"
   >
-    <!-- Badge de promoción -->
-    <div v-if="producto.tienePromocion" class="promo-badge">
-      -{{ producto.promocion.porcentaje }}%
-    </div>
-    <!-- Contenedor de imagen -->
-    <div class="product-image-wrapper">
-      <img
-        :src="producto.imagen_url || '/placeholder_product.jpg'"
-        :alt="producto.producto"
-        @error="handleImageError"
-        loading="lazy"
-      />
-    </div>
+    <!-- Carrusel de imágenes del producto -->
+    <ProductImageCarousel
+      :images="getProductImages(producto)"
+      :alt-text="producto.producto"
+      :auto-play="true"
+      :auto-play-interval="3000"
+      @click="verDetalle(producto.codigo)"
+    >
+      <template #badge>
+        <div v-if="producto.tienePromocion" class="promo-badge">
+          -{{ producto.promocion.porcentaje }}%
+        </div>
+      </template>
+    </ProductImageCarousel>
     <!-- Información del producto -->
     <div class="product-info">
       <h3 class="product-title">{{ producto.producto }}</h3>

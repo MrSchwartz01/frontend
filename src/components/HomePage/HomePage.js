@@ -5,6 +5,7 @@ import HeaderAnth from "../HeaderAnth/HeaderAnth.vue";
 import FooterAnth from "../FooterAnth/FooterAnth.vue";
 import CarouselBanner from "../CarouselBanner/CarouselBanner.vue";
 import HistorialProductosVistos from "../HistorialProductosVistos/HistorialProductosVistos.vue";
+import ProductImageCarousel from "../ProductImageCarousel/ProductImageCarousel.vue";
 
 export default {
   name: "HomePage",
@@ -13,6 +14,7 @@ export default {
     CarouselBanner,
     FooterAnth,
     HistorialProductosVistos,
+    ProductImageCarousel,
   },
   data() {
     return {
@@ -332,6 +334,25 @@ export default {
 
       // Guardar en localStorage
       localStorage.setItem('carrito', JSON.stringify(carrito));
+    },
+    getProductImages(producto) {
+      // Retornar array de imágenes del producto
+      if (producto.productImages && producto.productImages.length > 0) {
+        // Ordenar para que la imagen principal esté primero
+        const imagesSorted = [...producto.productImages].sort((a, b) => {
+          if (a.es_principal) return -1;
+          if (b.es_principal) return 1;
+          return 0;
+        });
+        return imagesSorted;
+      }
+      
+      // Fallback a imagen_url si no hay productImages
+      if (producto.imagen_url) {
+        return [producto.imagen_url];
+      }
+      
+      return [];
     },
     filtrarPorCategoria(nombreCategoria) {
       // Convertir el nombre de categoría a slug (minúsculas sin espacios)

@@ -706,3 +706,34 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   }
 
+  /* Estilos para el carrusel de imágenes en tarjetas de producto */
+  .product-card .product-image-carousel {
+    width: 100%;
+    height: 240px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .product-card .carousel-image-wrapper {
+    padding: 20px;
+    background: #f8f8f8;
+  }
+
+  .product-card .carousel-image {
+    object-fit: contain;
+  }
+
+  .product-card:hover .carousel-image {
+    transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    .product-card .product-image-carousel {
+      height: 200px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .product-card .product-image-carousel {
+      height: 180px;
+    }
+  }
