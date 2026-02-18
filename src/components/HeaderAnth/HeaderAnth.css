@@ -404,3 +404,228 @@
   .fade-enter, .fade-leave-to {
     opacity: 0;
   }
+
+  /* ============================================
+     RESPONSIVE DESIGN - MEDIA QUERIES
+     ============================================ */
+
+  /* Tablets y pantallas medianas (≤1024px) */
+  @media (max-width: 1024px) {
+    .main-header {
+      padding: 10px 20px;
+    }
+
+    .search-bar {
+      max-width: 400px;
+      margin: 0 15px;
+    }
+
+    .main-menu ul {
+      gap: 25px;
+    }
+
+    .main-menu a {
+      font-size: 11px;
+    }
+
+    .action-button {
+      font-size: 12px;
+      padding: 0 10px;
+    }
+  }
+
+  /* Móviles grandes (≤768px) */
+  @media (max-width: 768px) {
+    .main-header {
+      flex-wrap: wrap;
+      padding: 10px 15px;
+      gap: 10px;
+    }
+
+    .logo {
+      order: 1;
+      flex: 0 0 auto;
+    }
+
+    .logo img {
+      width: 60px;
+    }
+
+    .user-actions {
+      order: 2;
+      flex: 0 0 auto;
+      gap: 6px;
+    }
+
+    .search-bar {
+      order: 3;
+      flex: 1 1 100%;
+      max-width: 100%;
+      margin: 0;
+    }
+
+    .search-bar input {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+
+    .search-bar button .search-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    /* Ocultar textos de botones en móvil, mostrar solo iconos */
+    .perfil-button,
+    .admin-button,
+    .pedidos-button,
+    .tecnicos-button {
+      font-size: 0;
+      min-width: 36px;
+      padding: 0 8px;
+      position: relative;
+    }
+
+    .perfil-button::before,
+    .admin-button::before,
+    .pedidos-button::before,
+    .tecnicos-button::before {
+      font-size: 16px;
+    }
+
+    .perfil-button::before {
+      content: "👤";
+    }
+
+    .admin-button::before {
+      content: "⚙️";
+    }
+
+    .pedidos-button::before {
+      content: "📦";
+    }
+
+    .tecnicos-button::before {
+      content: "🔧";
+    }
+
+    /* Mantener texto en botones principales */
+    .action-button:not(.perfil-button):not(.admin-button):not(.pedidos-button):not(.tecnicos-button) {
+      font-size: 11px;
+      padding: 0 8px;
+    }
+
+    /* Menú de navegación - scroll horizontal */
+    .main-menu {
+      padding: 8px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .main-menu::-webkit-scrollbar {
+      height: 3px;
+    }
+
+    .main-menu::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    .main-menu::-webkit-scrollbar-thumb {
+      background: #FF8000;
+      border-radius: 3px;
+    }
+
+    .main-menu ul {
+      gap: 20px;
+      padding: 0 15px;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+    }
+
+    .main-menu a {
+      font-size: 11px;
+      white-space: nowrap;
+      padding: 4px 6px;
+    }
+  }
+
+  /* Móviles pequeños (≤480px) */
+  @media (max-width: 480px) {
+    .main-header {
+      padding: 8px 10px;
+    }
+
+    .logo img {
+      width: 50px;
+    }
+
+    .user-actions {
+      gap: 4px;
+    }
+
+    .carrito-button,
+    .perfil-button,
+    .admin-button,
+    .pedidos-button,
+    .tecnicos-button {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 6px;
+    }
+
+    .action-button:not(.perfil-button):not(.admin-button):not(.pedidos-button):not(.tecnicos-button):not(.carrito-button) {
+      font-size: 10px;
+      padding: 0 6px;
+      height: 32px;
+    }
+
+    .search-bar input {
+      font-size: 13px;
+      padding: 8px 10px;
+    }
+
+    .main-menu ul {
+      gap: 15px;
+      padding: 0 10px;
+    }
+
+    .main-menu a {
+      font-size: 10px;
+      padding: 3px 5px;
+    }
+
+    /* Ajustar dropdown en móvil */
+    .dropdown-wrapper {
+      left: 0;
+      transform: none;
+      right: 0;
+      padding-top: 5px;
+    }
+
+    .dropdown-content {
+      min-width: 100%;
+      max-height: 200px;
+      font-size: 12px;
+    }
+
+    .dropdown-content a {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+  }
+
+  /* Móviles muy pequeños (≤360px) */
+  @media (max-width: 360px) {
+    .main-menu ul {
+      gap: 12px;
+    }
+
+    .main-menu a {
+      font-size: 9px;
+    }
+
+    /* Ocultar algunos enlaces menos críticos en pantallas muy pequeñas */
+    .main-menu li:nth-child(n+7) {
+      display: none;
+    }
+  }
