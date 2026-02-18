@@ -243,6 +243,11 @@
         </div>
       </div>
 
+      <!-- Tab de Video -->
+      <div v-if="activeTab === 'video'" class="tab-panel">
+        <AdminVideo />
+      </div>
+
       <!-- Tab de Logo -->
       <div v-if="activeTab === 'logo'" class="tab-panel">
         <h2>Configuración del Logo</h2>

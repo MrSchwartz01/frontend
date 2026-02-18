@@ -3,6 +3,7 @@ import { API_BASE_URL } from '@/config/api';
 import AdminProductos from './AdminProductos.vue';
 import AdminGarantias from './AdminGarantias.vue';
 import AdminPersonalizacion from './AdminPersonalizacion.vue';
+import AdminVideo from './AdminVideo.vue';
 import NotificationsPanel from '../NotificationsPanel/NotificationsPanel.vue';
 import NotificationsBell from '../NotificationsPanel/NotificationsBell.vue';
 
@@ -12,6 +13,7 @@ export default {
     AdminProductos,
     AdminGarantias,
     AdminPersonalizacion,
+    AdminVideo,
     NotificationsPanel,
     NotificationsBell,
   },
@@ -24,8 +26,9 @@ export default {
         { id: 'promociones', label: 'Promociones' },
         { id: 'garantias', label: 'Garantías' },
         { id: 'banners', label: 'Banners' },
+        { id: 'video', label: 'Video' },
         { id: 'logo', label: 'Logo' },
-        { id: 'personalizacion', label: '🎨 Personalización' },
+        { id: 'personalizacion', label: 'Personalización' },
         { id: 'usuarios', label: 'Usuarios' },
         { id: 'permisos', label: 'Permisos Temporales' },
       ],

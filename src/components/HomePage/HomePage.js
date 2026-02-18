@@ -25,8 +25,8 @@ export default {
       limiteProductos: 10,
       selectedPriceRange: "", // '', 'low', 'mid', 'high'
       
-      // Video destacado - PERSONALIZA ESTOS DATOS
-      videoDestacado: "https://www.youtube.com/embed/r-DF3-FS_6k?si=DW930ua3fe_K9GjD&autoplay=1&mute=1&loop=1&playlist=r-DF3-FS_6k", // Video con autoplay y loop
+      // Video destacado - Se cargará desde la API
+      videoDestacado: "",
 
 
       
@@ -106,6 +106,17 @@ export default {
           { id: 1, titulo: "Banner 1", imagen_url: "/Banners/banner1.webp" },
           { id: 2, titulo: "Banner 2", imagen_url: "/Banners/banner2.avif" },
         ];
+      }
+
+      // Cargar Video Destacado desde la API
+      try {
+        const videoResponse = await apiClient.get('/configuracion/video-destacado/url');
+        this.videoDestacado = videoResponse.data.valor || '';
+        console.log('Video destacado cargado:', this.videoDestacado);
+      } catch (videoError) {
+        console.error('Error al cargar video destacado:', videoError);
+        // Fallback a video por defecto si falla la API
+        this.videoDestacado = 'https://www.youtube.com/embed/r-DF3-FS_6k?si=DW930ua3fe_K9GjD&autoplay=1&mute=1&loop=1&playlist=r-DF3-FS_6k';
       }
 
       // Cargar Productos
