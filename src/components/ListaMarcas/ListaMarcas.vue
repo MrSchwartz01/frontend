@@ -33,6 +33,9 @@
                 @error="handleImageError"
               />
               <h3>{{ marca.nombre_marca }}</h3>
+              <p v-if="marca.total_productos" class="productos-count">
+                {{ marca.total_productos }} {{ marca.total_productos === 1 ? 'producto' : 'productos' }}
+              </p>
             </div>
           </div>
           

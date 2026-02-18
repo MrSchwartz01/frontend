@@ -42,8 +42,32 @@ export default {
     async cargarMarcas() {
       try {
         this.cargando = true;
+        // Usar el nuevo endpoint para obtener marcas directamente
+        const response = await apiClient.get('/tienda/productos/marcas/lista');
+        const marcasData = response.data;
+        
+        // Mapear las marcas con sus imágenes
+        this.marcas = marcasData.map((marca, index) => ({
+          id: index + 1,
+          nombre_marca: marca.nombre_marca,
+          total_productos: marca.total_productos,
+          imagen_url: this.obtenerLogoMarca(marca.nombre_marca)
+        }));
+        
+        console.log('Marcas cargadas:', this.marcas.length);
+        
+      } catch (error) {
+        console.error('Error al cargar marcas:', error);
+        // Fallback al método anterior si el endpoint nuevo falla
+        await this.cargarMarcasFallback();
+      } finally {
+        this.cargando = false;
+      }
+    },
+    async cargarMarcasFallback() {
+      try {
+        // Método anterior como fallback
         const response = await apiClient.get('/tienda/productos');
-        // La API devuelve { data: [...], total, page, limit, totalPages }
         const productosArray = response.data.data || response.data;
         const productos = Array.isArray(productosArray) ? productosArray : [];
         
@@ -64,12 +88,9 @@ export default {
           nombre_marca: nombre,
           imagen_url: this.obtenerLogoMarca(nombre)
         }));
-        
-      } catch (error) {
-        console.error('Error al cargar marcas:', error);
+      } catch (fallbackError) {
+        console.error('Error en fallback:', fallbackError);
         this.marcas = [];
-      } finally {
-        this.cargando = false;
       }
     },
     obtenerLogoMarca(nombreMarca) {

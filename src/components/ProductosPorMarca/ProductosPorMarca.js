@@ -20,36 +20,15 @@ export default {
       isAuthenticated: false,
       cargando: true,
       error: null,
-      marcasMap: {
-        1: "ASUS",
-        2: "MSI",
-        3: "AMD",
-        4: "Intel",
-        5: "NVIDIA",
-        6: "Corsair",
-        7: "Kingston",
-        8: "Logitech",
-        9: "Razer",
-        10: "Samsung",
-        11: "Western Digital",
-        12: "Seagate",
-        13: "TP-Link",
-        14: "Cisco",
-        15: "Sony",
-        16: "JBL",
-        17: "Dell",
-        18: "HP",
-        19: "Lenovo",
-        20: "Apple",
-      },
     };
   },
   async created() {
     this.isAuthenticated = !!localStorage.getItem("access_token");
-    const marcaId = this.$route.params.id;
+    const marcaParam = this.$route.params.id;
     
-    // Obtener nombre de la marca desde el map
-    this.nombreMarca = this.marcasMap[marcaId] || "Marca";
+    // El parámetro puede ser el nombre de la marca directamente
+    // o un ID numérico del sistema antiguo (mantener compatibilidad)
+    this.nombreMarca = marcaParam || "Marca";
     
     // Cargar productos reales de la base de datos
     await this.cargarProductosPorMarca(this.nombreMarca);
@@ -145,10 +124,9 @@ export default {
       handler() {
         // Scroll hacia arriba cuando cambia la marca
         window.scrollTo(0, 0);
-        const marcaId = this.$route.params.id;
-        const marca = this.marcasMap[marcaId] || "Marca";
-        this.nombreMarca = marca;
-        this.cargarProductosPorMarca(marca);
+        const marcaParam = this.$route.params.id;
+        this.nombreMarca = marcaParam || "Marca";
+        this.cargarProductosPorMarca(this.nombreMarca);
       }
     }
   }
