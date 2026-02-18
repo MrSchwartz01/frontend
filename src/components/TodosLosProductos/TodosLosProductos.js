@@ -2,6 +2,7 @@ import HeaderAnth from '../HeaderAnth/HeaderAnth.vue';
 import FooterAnth from '../FooterAnth/FooterAnth.vue';
 import ContactoAsesor from '../ContactoAsesor/ContactoAsesor.vue';
 import apiClient from '@/services/api';
+import authService from '@/services/auth';
 
 export default {
   name: 'TodosLosProductos',
@@ -285,10 +286,11 @@ export default {
     },
     
     cerrarSesion() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      this.isAuthenticated = false;
-      this.$router.push('/login');
+      // Usar el servicio de autenticación centralizado
+      authService.logoutAndRedirect(this.$router);
+      
+      // Limpiar el estado de Vuex
+      this.$store.dispatch('limpiarTodo');
     },
     
     formatearPrecio(precio) {

@@ -5,6 +5,7 @@ import ProductosTop from './DashboardCharts/ProductosTop.vue';
 import VentasPorCategoria from './DashboardCharts/VentasPorCategoria.vue';
 import NotificationsBell from '../NotificationsPanel/NotificationsBell.vue';
 import apiClient from '@/services/api';
+import authService from '@/services/auth';
 
 export default {
   name: 'DashboardMain',
@@ -86,10 +87,11 @@ export default {
       this.$router.push({ path: '/productos', query: { search: query } });
     },
     cerrarSesion() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('user_rol');
-      this.isAuthenticated = false;
-      this.$router.push('/login');
+      // Usar el servicio de autenticación centralizado
+      authService.logoutAndRedirect(this.$router);
+      
+      // Limpiar el estado de Vuex
+      this.$store.dispatch('limpiarTodo');
     },
     verTodasOrdenes() {
       this.$router.push('/ordenes');

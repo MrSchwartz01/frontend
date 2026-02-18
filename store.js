@@ -40,6 +40,18 @@ import { createStore } from 'vuex';
       eliminarDelCarrito(state, productoCodigo) {
         state.carrito = state.carrito.filter((producto) => producto.codigo !== productoCodigo);
       },
+      limpiarCarrito(state) {
+        state.carrito = [];
+      },
+      limpiarHistorial(state) {
+        state.historialProductosVistos = [];
+        localStorage.removeItem(HISTORIAL_KEY);
+      },
+      limpiarTodo(state) {
+        state.carrito = [];
+        state.historialProductosVistos = [];
+        localStorage.removeItem(HISTORIAL_KEY);
+      },
       registrarProductoVisto(state, producto) {
         const ahora = Date.now();
         const existenteIndex = state.historialProductosVistos.findIndex(
@@ -79,6 +91,15 @@ import { createStore } from 'vuex';
       },
       eliminarDelCarrito({ commit }, productoCodigo) {
         commit('eliminarDelCarrito', productoCodigo);
+      },
+      limpiarCarrito({ commit }) {
+        commit('limpiarCarrito');
+      },
+      limpiarHistorial({ commit }) {
+        commit('limpiarHistorial');
+      },
+      limpiarTodo({ commit }) {
+        commit('limpiarTodo');
       },
       registrarProductoVisto({ commit }, producto) {
         commit('registrarProductoVisto', producto);

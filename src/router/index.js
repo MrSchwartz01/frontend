@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import authService from '../services/auth';
 import SesionUsuario from '../components/SesionUsuario/SesionUsuario.vue';
 import RegistroUsuario from '../components/RegistroUsuario/RegistroUsuario.vue';
 import Home from '../components/HomePage/HomePage.vue';
@@ -272,6 +273,64 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+});
+
+// Guard global para verificar autenticación y prevenir acceso mediante caché
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = authService.isAuthenticated();
+  const userRol = authService.getUserRole();
+
+  // Lista de rutas que requieren autenticación
+  const rutasProtegidas = [
+    '/perfil',
+    '/dashboard',
+    '/admin/panel',
+    '/admin/notifications',
+    '/admin/crear-producto',
+    '/panel-vendedores',
+    '/panel-tecnicos',
+    '/crear-work-order'
+  ];
+
+  // Lista de rutas que requieren roles específicos
+  const rutasAdmin = ['/dashboard'];
+  const rutasAdminVendedor = ['/admin/panel', '/admin/notifications', '/admin/crear-producto', '/panel-vendedores'];
+  const rutasAdminTecnico = ['/panel-tecnicos', '/crear-work-order'];
+
+  // Verificar si la ruta requiere autenticación
+  const requiereAuth = rutasProtegidas.some(ruta => to.path.startsWith(ruta));
+
+  if (requiereAuth && !isAuthenticated) {
+    // Si no está autenticado, redirigir al login
+    next('/login');
+    return;
+  }
+
+  // Verificar permisos de rol para rutas protegidas
+  if (isAuthenticated) {
+    // Rutas solo para administradores
+    if (rutasAdmin.some(ruta => to.path.startsWith(ruta)) && userRol !== 'administrador') {
+      next('/home');
+      return;
+    }
+
+    // Rutas para administradores y vendedores
+    if (rutasAdminVendedor.some(ruta => to.path.startsWith(ruta)) && 
+        userRol !== 'administrador' && userRol !== 'vendedor') {
+      next('/home');
+      return;
+    }
+
+    // Rutas para administradores y técnicos
+    if (rutasAdminTecnico.some(ruta => to.path.startsWith(ruta)) && 
+        userRol !== 'administrador' && userRol !== 'tecnico') {
+      next('/home');
+      return;
+    }
+  }
+
+  // Si todo está bien, continuar con la navegación
+  next();
 });
 
 // Manejo de errores globales de navegación

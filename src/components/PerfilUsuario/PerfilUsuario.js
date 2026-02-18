@@ -1,6 +1,7 @@
 import HeaderAnth from '../HeaderAnth/HeaderAnth.vue';
 import FooterAnth from '../FooterAnth/FooterAnth.vue';
 import apiClient from '@/services/api';
+import authService from '@/services/auth';
 
 export default {
   name: 'PerfilUsuario',
@@ -273,12 +274,11 @@ export default {
     },
     
     cerrarSesion() {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user_id');
-      localStorage.removeItem('user_rol');
-      this.isAuthenticated = false;
-      this.$router.push('/login');
+      // Usar el servicio de autenticación centralizado
+      authService.logoutAndRedirect(this.$router);
+      
+      // Limpiar el estado de Vuex
+      this.$store.dispatch('limpiarTodo');
     }
   },
   watch: {
