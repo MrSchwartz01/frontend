@@ -1,5 +1,5 @@
 // Servicio de autenticación centralizado
-import store from '../store';
+import store from '../../store';
 
 /**
  * Servicio de autenticación para manejar login, logout y estado de sesión
