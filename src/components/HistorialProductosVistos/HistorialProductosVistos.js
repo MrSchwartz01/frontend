@@ -1,5 +1,13 @@
 export default {
   name: "HistorialProductosVistos",
+  data() {
+    return {
+      isAuthenticated: false,
+    };
+  },
+  created() {
+    this.isAuthenticated = !!localStorage.getItem("access_token");
+  },
   computed: {
     historial() {
       return this.$store.getters.historialProductosVistos;

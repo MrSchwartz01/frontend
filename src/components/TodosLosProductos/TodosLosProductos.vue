@@ -169,10 +169,11 @@
                 <h3>{{ producto.producto }}</h3>
                 <p class="descripcion" v-if="producto.medida">Medida: {{ producto.medida }}</p>
                 <div class="producto-footer">
-                  <div class="precio-info">
+                  <div v-if="isAuthenticated" class="precio-info">
                     <p class="precio">${{ formatearPrecio(producto.costoTotal) }}</p>
                     <p style="font-size: 0.75em; color: #999; margin: 0;">incluido IVA</p>
                   </div>
+                  <p v-else class="precio">Inicia sesión para ver precio</p>
                   <p class="stock" :class="{ 'sin-stock': parseInt(producto.existenciaTotal) === 0, 'pocas-unidades': parseInt(producto.existenciaTotal) > 0 && parseInt(producto.existenciaTotal) <= 5 }">
                     {{ obtenerTextoStock(parseInt(producto.existenciaTotal)) }}
                   </p>

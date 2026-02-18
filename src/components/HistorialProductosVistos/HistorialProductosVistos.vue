@@ -15,10 +15,13 @@
         />
         <div class="historial-info">
           <p class="historial-nombre">{{ producto.producto || 'Producto' }}</p>
-          <p v-if="producto.costoTotal !== null" class="historial-precio">
-            ${{ formatPrice(producto.costoTotal) }}
-          </p>
-          <p v-if="producto.costoTotal !== null" style="font-size: 0.7em; color: #999; margin: 0;">incluido IVA</p>
+          <div v-if="isAuthenticated && producto.costoTotal !== null">
+            <p class="historial-precio">
+              ${{ formatPrice(producto.costoTotal) }}
+            </p>
+            <p style="font-size: 0.7em; color: #999; margin: 0;">incluido IVA</p>
+          </div>
+          <p v-else-if="!isAuthenticated" class="historial-precio">Inicia sesión para ver precio</p>
           <p class="historial-fecha">Visto hace {{ tiempoRelativo(producto.vistoEn) }}</p>
         </div>
       </div>

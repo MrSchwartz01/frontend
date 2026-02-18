@@ -36,8 +36,11 @@
               />
     <h3>{{ producto.producto }}</h3>
     <p>{{ producto.medida }}</p>
-    <p class="precio">Precio: ${{ producto.costoTotal }}</p>
-    <p style="font-size: 0.75em; color: #999; margin: 0;">incluido IVA</p>
+    <div v-if="isAuthenticated">
+      <p class="precio">Precio: ${{ producto.costoTotal }}</p>
+      <p style="font-size: 0.75em; color: #999; margin: 0;">incluido IVA</p>
+    </div>
+    <p v-else class="precio">Inicia sesión para ver precio</p>
     
     <!-- Mostrar stock disponible -->
     <p class="stock" :class="{ 'sin-stock': parseInt(producto.existenciaTotal) === 0, 'pocas-unidades': parseInt(producto.existenciaTotal) > 0 && parseInt(producto.existenciaTotal) <= 5 }">
