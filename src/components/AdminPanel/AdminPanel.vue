@@ -61,12 +61,33 @@
           <form @submit.prevent="submitPromotion" class="promotion-form">
             <div class="form-group">
               <label>Producto:</label>
-              <select v-model="promotionForm.producto_id" required>
-                <option value="">Seleccione un producto</option>
-                <option v-for="producto in productos" :key="producto.codigo" :value="producto.codigo">
-                  {{ producto.producto }} - ${{ producto.precioUnitario?.precioA || producto.costoTotal || 0 }}
-                </option>
-              </select>
+              <div class="product-search-container">
+                <input 
+                  type="text" 
+                  v-model="busquedaProductoPromocion" 
+                  placeholder="Buscar por código o nombre..."
+                  class="search-input"
+                  @focus="mostrarListaProductosPromo = true"
+                />
+                <select 
+                  v-model="promotionForm.producto_id" 
+                  required 
+                  @focus="mostrarListaProductosPromo = true"
+                  :size="mostrarListaProductosPromo ? 8 : 1"
+                >
+                  <option value="">Seleccione un producto</option>
+                  <option 
+                    v-for="producto in productosFiltradosPromocion" 
+                    :key="producto.codigo" 
+                    :value="producto.codigo"
+                  >
+                    [{{ producto.codigo }}] {{ producto.producto }} - ${{ producto.precioUnitario?.precioA || producto.costoTotal || 0 }}
+                  </option>
+                </select>
+                <small class="helper-text">
+                  {{ productosFiltradosPromocion.length }} productos encontrados
+                </small>
+              </div>
             </div>
 
             <div class="form-group">
@@ -195,12 +216,32 @@
 
             <div class="form-group">
               <label>Producto Asociado (opcional):</label>
-              <select v-model="bannerForm.producto_id">
-                <option :value="null">Sin asociar</option>
-                <option v-for="producto in productos" :key="producto.codigo" :value="producto.codigo">
-                  {{ producto.producto }}
-                </option>
-              </select>
+              <div class="product-search-container">
+                <input 
+                  type="text" 
+                  v-model="busquedaProductoBanner" 
+                  placeholder="Buscar por código o nombre..."
+                  class="search-input"
+                  @focus="mostrarListaProductos = true"
+                />
+                <select 
+                  v-model="bannerForm.producto_id" 
+                  @focus="mostrarListaProductos = true"
+                  :size="mostrarListaProductos ? 8 : 1"
+                >
+                  <option :value="null">Sin asociar</option>
+                  <option 
+                    v-for="producto in productosFiltradosBanner" 
+                    :key="producto.codigo" 
+                    :value="producto.codigo"
+                  >
+                    [{{ producto.codigo }}] {{ producto.producto }}
+                  </option>
+                </select>
+                <small class="helper-text">
+                  {{ productosFiltradosBanner.length }} productos encontrados
+                </small>
+              </div>
             </div>
 
             <div class="form-actions">

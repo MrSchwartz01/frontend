@@ -50,6 +50,8 @@ export default {
         fecha_fin: '',
         activa: true,
       },
+      busquedaProductoPromocion: '',
+      mostrarListaProductosPromo: false,
       promotionMessage: '',
       promotionMessageType: '',
 
@@ -61,6 +63,8 @@ export default {
         imagen_url: '',
         producto_id: null,
       },
+      busquedaProductoBanner: '',
+      mostrarListaProductos: false,
       bannerMessage: '',
       bannerMessageType: '',
 
@@ -296,6 +300,8 @@ export default {
         fecha_fin: '',
         activa: true,
       };
+      this.busquedaProductoPromocion = '';
+      this.mostrarListaProductosPromo = false;
     },
 
     showPromotionMessage(message, type) {
@@ -375,6 +381,8 @@ export default {
         imagen_url: '',
         producto_id: null,
       };
+      this.busquedaProductoBanner = '';
+      this.mostrarListaProductos = false;
     },
 
     showBannerMessage(message, type) {
@@ -814,6 +822,36 @@ export default {
           return !permiso.activo || new Date(permiso.fecha_expiracion) <= now;
         }
         return true; // 'all'
+      });
+    },
+
+    productosFiltradosBanner() {
+      if (!this.busquedaProductoBanner.trim()) {
+        return this.productos;
+      }
+
+      const busqueda = this.busquedaProductoBanner.toLowerCase().trim();
+      
+      return this.productos.filter(producto => {
+        const codigo = String(producto.codigo).toLowerCase();
+        const nombre = (producto.producto || '').toLowerCase();
+        
+        return codigo.includes(busqueda) || nombre.includes(busqueda);
+      });
+    },
+
+    productosFiltradosPromocion() {
+      if (!this.busquedaProductoPromocion.trim()) {
+        return this.productos;
+      }
+
+      const busqueda = this.busquedaProductoPromocion.toLowerCase().trim();
+      
+      return this.productos.filter(producto => {
+        const codigo = String(producto.codigo).toLowerCase();
+        const nombre = (producto.producto || '').toLowerCase();
+        
+        return codigo.includes(busqueda) || nombre.includes(busqueda);
       });
     },
   },
