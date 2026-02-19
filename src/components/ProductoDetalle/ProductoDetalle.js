@@ -31,8 +31,8 @@ export default {
   computed: {
     imagenPrincipal() {
       if (this.imagenes && this.imagenes.length > 0) {
-        // Usar el índice actual del carousel y construir URL completa
-        return getImageUrl(this.imagenes[this.currentImageIndex].ruta_imagen);
+        // La URL ya está procesada en cargarProducto(), solo retornarla
+        return this.imagenes[this.currentImageIndex].ruta_imagen;
       }
       return '/placeholder_product.jpg';
     },
