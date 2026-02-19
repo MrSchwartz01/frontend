@@ -63,8 +63,8 @@
               <label>Producto:</label>
               <select v-model="promotionForm.producto_id" required>
                 <option value="">Seleccione un producto</option>
-                <option v-for="producto in productos" :key="producto.id" :value="producto.id">
-                  {{ producto.nombre_producto }} - ${{ producto.precio }}
+                <option v-for="producto in productos" :key="producto.codigo" :value="producto.codigo">
+                  {{ producto.producto }} - ${{ producto.precioUnitario?.precioA || producto.costoTotal || 0 }}
                 </option>
               </select>
             </div>
@@ -147,10 +147,10 @@
             <tbody>
               <tr v-for="promo in promociones" :key="promo.id">
                 <td>{{ promo.id }}</td>
-                <td>{{ promo.producto?.nombre_producto }}</td>
+                <td>{{ promo.producto?.producto }}</td>
                 <td>{{ promo.porcentaje_descuento }}%</td>
-                <td>${{ promo.producto?.precio }}</td>
-                <td>${{ calcularPrecioConDescuento(promo.producto?.precio, promo.porcentaje_descuento) }}</td>
+                <td>${{ promo.producto?.costoTotal || 0 }}</td>
+                <td>${{ calcularPrecioConDescuento(promo.producto?.costoTotal || 0, promo.porcentaje_descuento) }}</td>
                 <td>{{ formatDate(promo.fecha_inicio) }}</td>
                 <td>{{ formatDate(promo.fecha_fin) }}</td>
                 <td>
@@ -197,8 +197,8 @@
               <label>Producto Asociado (opcional):</label>
               <select v-model="bannerForm.producto_id">
                 <option :value="null">Sin asociar</option>
-                <option v-for="producto in productos" :key="producto.id" :value="producto.id">
-                  {{ producto.nombre_producto }}
+                <option v-for="producto in productos" :key="producto.codigo" :value="producto.codigo">
+                  {{ producto.producto }}
                 </option>
               </select>
             </div>
