@@ -96,11 +96,10 @@ export default {
         // Cargar imágenes del producto
         try {
           const imagenesResponse = await apiClient.get(`/images/producto/${productoCodigo}`);
-          // Transformar las rutas de imágenes a URLs completas
+          // Transformar las rutas de imágenes a URLs completas (procesar aquí para miniaturas)
           this.imagenes = imagenesResponse.data.map(img => ({
             ...img,
-            // Guardar la URL completa en una propiedad separada si es necesario para el template
-            ruta_imagen: img.ruta_imagen // Mantener la ruta original, getImageUrl la convertirá
+            ruta_imagen: getImageUrl(img.ruta_imagen) // Procesar con getImageUrl para que las miniaturas funcionen
           }));
         } catch (imgError) {
           console.warn('No se pudieron cargar las imágenes:', imgError);
