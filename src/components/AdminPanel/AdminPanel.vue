@@ -400,7 +400,10 @@
                   type="text"
                   v-model="userForm.telefono"
                   pattern="[0-9+\-\s()]+"
+                  title="Solo números, espacios y caracteres: + - ( )"
+                  placeholder="+593 99 999 9999 o 0999999999"
                 />
+                <small class="field-help">Ejemplo: +593 99 999 9999 o (02) 234-5678</small>
               </div>
             </div>
 
@@ -475,6 +478,12 @@
                 <td>{{ user.ultimo_acceso ? formatDate(user.ultimo_acceso) : 'Nunca' }}</td>
                 <td class="actions">
                   <button v-if="isAdmin" @click="editUser(user)" class="btn-icon" title="Editar">✏️</button>
+                  <button 
+                    v-if="isAdmin && !isCurrentUser(user.id)" 
+                    @click="openResetPasswordModal(user)" 
+                    class="btn-icon btn-warning" 
+                    title="Resetear Contraseña"
+                  >🔑</button>
                   <button 
                     v-if="isAdmin && !isCurrentUser(user.id)" 
                     @click="deleteUser(user.id)" 
@@ -656,6 +665,63 @@
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para Resetear Contraseña -->
+    <div v-if="showResetPasswordModal" class="modal-overlay" @click.self="closeResetPasswordModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🔑 Resetear Contraseña</h3>
+          <button class="modal-close" @click="closeResetPasswordModal">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="warning-text">
+            Vas a resetear la contraseña del usuario:
+            <strong>{{ resetPasswordUser?.nombre }} {{ resetPasswordUser?.apellido }}</strong>
+            ({{ resetPasswordUser?.username }})
+          </p>
+          
+          <form @submit.prevent="submitResetPassword" class="reset-password-form">
+            <div class="form-group">
+              <label>Nueva Contraseña: <span class="required">*</span></label>
+              <input
+                type="password"
+                v-model="resetPasswordForm.nuevaPassword"
+                placeholder="Mínimo 6 caracteres"
+                required
+                minlength="6"
+              />
+              <small class="help-text">
+                La contraseña debe tener al menos 6 caracteres, una letra, un número y un carácter especial (@$!%*?&.,-_:)
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label>Confirmar Nueva Contraseña: <span class="required">*</span></label>
+              <input
+                type="password"
+                v-model="resetPasswordForm.confirmarPassword"
+                placeholder="Repite la contraseña"
+                required
+                minlength="6"
+              />
+            </div>
+
+            <div v-if="resetPasswordMessage" :class="['message', resetPasswordMessageType]">
+              {{ resetPasswordMessage }}
+            </div>
+
+            <div class="modal-actions">
+              <button type="submit" class="btn btn-primary" :disabled="resettingPassword">
+                {{ resettingPassword ? 'Reseteando...' : '🔑 Resetear Contraseña' }}
+              </button>
+              <button type="button" class="btn btn-secondary" @click="closeResetPasswordModal" :disabled="resettingPassword">
+                Cancelar
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

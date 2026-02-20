@@ -101,8 +101,11 @@
                     id="telefono"
                     v-model="formData.telefono"
                     :disabled="!modoEdicion"
-                    placeholder="0999999999"
+                    placeholder="+593 99 999 9999 o 0999999999"
+                    pattern="[0-9+\-\s()]+"
+                    title="Solo números, espacios y caracteres: + - ( )"
                   />
+                  <small class="field-help">Ejemplo: +593 99 999 9999 o (02) 234-5678</small>
                 </div>
               </div>
 

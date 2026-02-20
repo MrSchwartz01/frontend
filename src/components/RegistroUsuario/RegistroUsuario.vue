@@ -85,9 +85,12 @@
                 v-model="telefono"
                 id="telefono"
                 type="text"
-                placeholder="Número de teléfono"
+                placeholder="+593 99 999 9999 o 0999999999"
+                pattern="[0-9+\-\s()]+"
+                title="Solo números, espacios y caracteres: + - ( )"
                 @input="clearError('telefono')"
               />
+              <small class="field-help">Ejemplo: +593 99 999 9999 o (02) 234-5678</small>
               <p v-if="errors.telefono" class="error">{{ errors.telefono }}</p>
             </div>
 

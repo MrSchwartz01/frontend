@@ -147,6 +147,14 @@
   cursor: not-allowed;
 }
 
+.field-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
 .form-group small {
   color: #888;
   font-size: 0.85rem;

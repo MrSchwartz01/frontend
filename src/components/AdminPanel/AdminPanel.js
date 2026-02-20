@@ -93,6 +93,17 @@ export default {
       userMessage: '',
       userMessageType: '',
 
+      // Reset Password
+      showResetPasswordModal: false,
+      resetPasswordUser: null,
+      resetPasswordForm: {
+        nuevaPassword: '',
+        confirmarPassword: '',
+      },
+      resetPasswordMessage: '',
+      resetPasswordMessageType: '',
+      resettingPassword: false,
+
       // Permisos Temporales
       permisos: [],
       vendedores: [],
@@ -505,9 +516,15 @@ export default {
       
       // Validar teléfono (opcional, pero si se llena debe ser válido)
       if (this.userForm.telefono && this.userForm.telefono.trim() !== '') {
-        const phoneRegex = /^[0-9+\-\s()]+$/;
-        if (!phoneRegex.test(this.userForm.telefono)) {
-          errors.push('El teléfono solo puede contener números, espacios y los caracteres + - ( )');
+        const telefonoTrim = this.userForm.telefono.trim();
+        
+        // Validar longitud
+        if (telefonoTrim.length < 7 || telefonoTrim.length > 20) {
+          errors.push('El teléfono debe tener entre 7 y 20 caracteres');
+        }
+        // Validar formato: solo números, espacios, +, -, ( )
+        else if (!/^[0-9+\-\s()]+$/.test(telefonoTrim)) {
+          errors.push('El teléfono solo puede contener números, espacios y los caracteres: + - ( )');
         }
       }
       
@@ -623,6 +640,97 @@ export default {
           error.response?.data?.message || 'Error al eliminar el usuario',
           'error'
         );
+      }
+    },
+
+    openResetPasswordModal(user) {
+      this.resetPasswordUser = user;
+      this.showResetPasswordModal = true;
+      this.resetPasswordForm = {
+        nuevaPassword: '',
+        confirmarPassword: '',
+      };
+      this.resetPasswordMessage = '';
+    },
+
+    closeResetPasswordModal() {
+      this.showResetPasswordModal = false;
+      this.resetPasswordUser = null;
+      this.resetPasswordForm = {
+        nuevaPassword: '',
+        confirmarPassword: '',
+      };
+      this.resetPasswordMessage = '';
+      this.resettingPassword = false;
+    },
+
+    validateResetPasswordForm() {
+      const errors = [];
+
+      if (!this.resetPasswordForm.nuevaPassword) {
+        errors.push('La nueva contraseña es obligatoria');
+      } else if (this.resetPasswordForm.nuevaPassword.length < 6) {
+        errors.push('La contraseña debe tener al menos 6 caracteres');
+      } else {
+        // Validar que tenga letra, número y carácter especial
+        const hasLetter = /[A-Za-z]/.test(this.resetPasswordForm.nuevaPassword);
+        const hasNumber = /\d/.test(this.resetPasswordForm.nuevaPassword);
+        const hasSpecial = /[@$!%*?&.,\-_:]/.test(this.resetPasswordForm.nuevaPassword);
+
+        if (!hasLetter || !hasNumber || !hasSpecial) {
+          errors.push('La contraseña debe incluir al menos una letra, un número y un carácter especial (@$!%*?&.,-_:)');
+        }
+      }
+
+      if (!this.resetPasswordForm.confirmarPassword) {
+        errors.push('Debes confirmar la contraseña');
+      } else if (this.resetPasswordForm.nuevaPassword !== this.resetPasswordForm.confirmarPassword) {
+        errors.push('Las contraseñas no coinciden');
+      }
+
+      return errors;
+    },
+
+    async submitResetPassword() {
+      try {
+        // Validar formulario
+        const validationErrors = this.validateResetPasswordForm();
+        if (validationErrors.length > 0) {
+          this.resetPasswordMessage = validationErrors.join('. ');
+          this.resetPasswordMessageType = 'error';
+          return;
+        }
+
+        this.resettingPassword = true;
+
+        // Enviar petición al backend
+        await apiClient.patch(
+          `/usuarios/${this.resetPasswordUser.id}/reset-password`,
+          { nuevaPassword: this.resetPasswordForm.nuevaPassword },
+          this.getAuthHeaders()
+        );
+
+        this.showUserMessage(
+          `✅ Contraseña de ${this.resetPasswordUser.nombre} ${this.resetPasswordUser.apellido} restablecida exitosamente`,
+          'success'
+        );
+        this.closeResetPasswordModal();
+      } catch (error) {
+        console.error('Error al resetear contraseña:', error);
+        
+        let errorMsg = 'Error al resetear la contraseña';
+        if (error.response?.data?.message) {
+          if (Array.isArray(error.response.data.message)) {
+            errorMsg = error.response.data.message.join(', ');
+          } else {
+            errorMsg = error.response.data.message;
+          }
+        }
+        
+        this.resetPasswordMessage = errorMsg;
+        this.resetPasswordMessageType = 'error';
+      } finally {
+        this.resettingPassword = false;
       }
     },
 

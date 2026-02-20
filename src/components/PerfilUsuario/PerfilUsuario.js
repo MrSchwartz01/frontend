@@ -107,10 +107,40 @@ export default {
       this.mensaje = '';
     },
     
+    validarTelefono(telefono) {
+      if (!telefono || telefono.trim() === '') {
+        return true; // Teléfono es opcional
+      }
+      
+      const telefonoTrim = telefono.trim();
+      
+      // Validar longitud
+      if (telefonoTrim.length < 7 || telefonoTrim.length > 20) {
+        return 'El teléfono debe tener entre 7 y 20 caracteres';
+      }
+      
+      // Validar formato: solo números, espacios, +, -, ( )
+      if (!/^[0-9+\-\s()]+$/.test(telefonoTrim)) {
+        return 'El teléfono solo puede contener números, espacios y los caracteres: + - ( )';
+      }
+      
+      return true;
+    },
+
     async actualizarDatos() {
       try {
         this.guardando = true;
         this.mensaje = '';
+        
+        // Validar teléfono antes de enviar
+        if (this.formData.telefono) {
+          const validacionTelefono = this.validarTelefono(this.formData.telefono);
+          if (validacionTelefono !== true) {
+            this.mostrarMensaje('⚠️ ' + validacionTelefono, 'error');
+            this.guardando = false;
+            return;
+          }
+        }
         
         const token = localStorage.getItem('access_token');
 
