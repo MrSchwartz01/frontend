@@ -452,8 +452,89 @@ export default {
       }
     },
 
+    validateUserForm() {
+      const errors = [];
+      
+      // Validar nombre
+      if (!this.userForm.nombre || this.userForm.nombre.trim() === '') {
+        errors.push('El nombre es obligatorio');
+      } else if (this.userForm.nombre.trim().length < 2) {
+        errors.push('El nombre debe tener al menos 2 caracteres');
+      } else if (this.userForm.nombre.trim().length > 50) {
+        errors.push('El nombre no puede exceder 50 caracteres');
+      }
+      
+      // Validar apellido
+      if (!this.userForm.apellido || this.userForm.apellido.trim() === '') {
+        errors.push('El apellido es obligatorio');
+      } else if (this.userForm.apellido.trim().length < 2) {
+        errors.push('El apellido debe tener al menos 2 caracteres');
+      } else if (this.userForm.apellido.trim().length > 50) {
+        errors.push('El apellido no puede exceder 50 caracteres');
+      }
+      
+      // Validar username
+      if (!this.userForm.username || this.userForm.username.trim() === '') {
+        errors.push('El username es obligatorio');
+      } else if (this.userForm.username.trim().length < 3) {
+        errors.push('El username debe tener al menos 3 caracteres');
+      } else if (this.userForm.username.trim().length > 30) {
+        errors.push('El username no puede exceder 30 caracteres');
+      } else if (!/^[a-zA-Z0-9_]+$/.test(this.userForm.username)) {
+        errors.push('El username solo puede contener letras, números y guiones bajos');
+      }
+      
+      // Validar email
+      if (!this.userForm.email || this.userForm.email.trim() === '') {
+        errors.push('El email es obligatorio');
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(this.userForm.email)) {
+          errors.push('El email no tiene un formato válido');
+        }
+      }
+      
+      // Validar contraseña solo al crear usuario nuevo
+      if (!this.editingUser) {
+        if (!this.userForm.password || this.userForm.password.trim() === '') {
+          errors.push('La contraseña es obligatoria para usuarios nuevos');
+        } else if (this.userForm.password.length < 6) {
+          errors.push('La contraseña debe tener al menos 6 caracteres');
+        }
+      }
+      
+      // Validar teléfono (opcional, pero si se llena debe ser válido)
+      if (this.userForm.telefono && this.userForm.telefono.trim() !== '') {
+        const phoneRegex = /^[0-9+\-\s()]+$/;
+        if (!phoneRegex.test(this.userForm.telefono)) {
+          errors.push('El teléfono solo puede contener números, espacios y los caracteres + - ( )');
+        }
+      }
+      
+      // Validar rol
+      if (!this.userForm.rol || this.userForm.rol === '') {
+        errors.push('Debe seleccionar un rol');
+      } else if (!['administrador', 'vendedor', 'tecnico'].includes(this.userForm.rol)) {
+        errors.push('El rol seleccionado no es válido');
+      }
+      
+      // Validar dirección (opcional, pero si se llena tiene límite)
+      if (this.userForm.direccion && this.userForm.direccion.length > 200) {
+        errors.push('La dirección no puede exceder 200 caracteres');
+      }
+      
+      return errors;
+    },
+
     async submitUser() {
       try {
+        // Validar formulario antes de enviar
+        const validationErrors = this.validateUserForm();
+        if (validationErrors.length > 0) {
+          this.showUserMessage(validationErrors.join('. '), 'error');
+          return;
+        }
+
         // Debug: verificar token y headers
         const token = localStorage.getItem('access_token');
         const headers = this.getAuthHeaders();
@@ -568,7 +649,7 @@ export default {
       this.userMessageType = type;
       setTimeout(() => {
         this.userMessage = '';
-      }, 3000);
+      }, 5000);
     },
 
     isCurrentUser(userId) {

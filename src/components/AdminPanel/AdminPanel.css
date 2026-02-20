@@ -297,6 +297,14 @@
   background: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.message.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
 }
 
 /* Data Table */

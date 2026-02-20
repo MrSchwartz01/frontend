@@ -333,16 +333,18 @@ export default {
       }
     },
 
-    async eliminarImagen(imagen) {
+    async eliminarImagen(imagenId) {
       if (!confirm('¿Está seguro de eliminar esta imagen?')) return;
 
       try {
-        await apiClient.delete(`/images/${imagen.id}`);
+        // imagenId es el ID directo que se pasa desde el template
+        await apiClient.delete(`/images/${imagenId}`);
         await this.cargarImagenes(this.productoActual.codigo);
         alert('Imagen eliminada correctamente');
       } catch (error) {
         console.error('Error al eliminar imagen:', error);
-        alert('Error al eliminar imagen');
+        const errorMsg = error.response?.data?.message || 'Error desconocido';
+        alert(`Error al eliminar imagen: ${errorMsg}`);
       }
     },
 
