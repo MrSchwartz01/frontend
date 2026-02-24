@@ -70,18 +70,11 @@
   transform: translateY(-1px);
 }
 
-/* Layout con dos columnas */
+/* Layout con dos columnas: filtros izquierda, productos derecha */
 .content-layout {
   display: flex;
   gap: 30px;
   align-items: flex-start;
-  flex-direction: row;
-}
-
-.productos-section {
-  flex: 1;
-  min-width: 0;
-  order: 2;
 }
 
 /* Sidebar de filtros a la izquierda */
@@ -92,7 +85,11 @@
   top: 20px;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
-  order: 1;
+}
+
+.productos-section {
+  flex: 1;
+  min-width: 0;
 }
 
 .filtros-container {
