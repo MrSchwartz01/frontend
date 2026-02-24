@@ -12,7 +12,8 @@ import CarouselBanner from '../components/CarouselBanner/CarouselBanner.vue';
 import RedesSociales from '../components/RedesSociales/RedesSociales.vue';
 import ServicioTecnico from '../components/ServicioTecnico/ServicioTecnico.vue';
 import ProductosPorMarca from '../components/ProductosPorMarca/ProductosPorMarca.vue';
-// CategoriasProductos y ProductosPorCategoria eliminados - ya no se usan categorías
+import CategoriasProductos from '../components/CategoriasProductos/CategoriasProductos.vue';
+import ProductosPorCategoria from '../components/ProductosPorCategoria/ProductosPorCategoria.vue';
 import CarritoCompras from '../components/CarritoCompras/CarritoCompras.vue';
 import Promociones from '../components/Promociones/Promociones.vue';
 import CreateProduct from '../components/Admin/CreateProduct.vue';
@@ -113,14 +114,15 @@ const routes = [
     name: "ProductosPorMarca",
     component: ProductosPorMarca,
   },
-  // Rutas de categorías eliminadas - redirigir a productos
   {
     path: "/categorias",
-    redirect: "/productos",
+    name: "CategoriasProductos",
+    component: CategoriasProductos,
   },
   {
     path: "/productos/categoria/:categoria",
-    redirect: "/productos",
+    name: "ProductosPorCategoria",
+    component: ProductosPorCategoria,
   },
   {
     path: "/productos",

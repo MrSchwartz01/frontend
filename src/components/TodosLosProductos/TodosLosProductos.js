@@ -24,6 +24,7 @@ export default {
       filtros: {
         marcas: [],
         medidas: [],
+        categorias: [],
         precioMin: null,
         precioMax: null,
         soloDisponibles: false
@@ -32,6 +33,7 @@ export default {
       // Opciones disponibles
       marcasDisponibles: [],
       medidasDisponibles: [],
+      categoriasDisponibles: [],
       precioMinimo: 0,
       precioMaximo: 0,
       
@@ -149,6 +151,17 @@ export default {
         if (p.medida) medidasSet.add(p.medida);
       });
       this.medidasDisponibles = Array.from(medidasSet).sort();
+      
+      // Extraer categorías únicas
+      const categoriasSet = new Set();
+      this.productos.forEach(p => {
+        if (p.categoria) categoriasSet.add(p.categoria);
+      });
+      this.categoriasDisponibles = Array.from(categoriasSet).filter(c => c !== 'Otros').sort();
+      // Agregar 'Otros' al final si existe
+      if (this.productos.some(p => p.categoria === 'Otros')) {
+        this.categoriasDisponibles.push('Otros');
+      }
     },
     
     calcularRangoPrecio() {
@@ -195,6 +208,7 @@ export default {
       this.filtros = {
         marcas: [],
         medidas: [],
+        categorias: [],
         precioMin: this.precioMinimo,
         precioMax: this.precioMaximo,
         soloDisponibles: false
@@ -267,6 +281,13 @@ export default {
       if (this.filtros.marcas.length > 0) {
         resultado = resultado.filter(p => 
           this.filtros.marcas.includes(p.marca)
+        );
+      }
+      
+      // Filtro por categoría
+      if (this.filtros.categorias.length > 0) {
+        resultado = resultado.filter(p => 
+          this.filtros.categorias.includes(p.categoria)
         );
       }
       

@@ -20,24 +20,6 @@ export default {
       nombreCategoria: "",
       marcaSeleccionada: null,
       productos: [],
-      categoriasInfo: {
-        laptops: "Laptops",
-        desktops: "Computadoras de Escritorio",
-        monitores: "Monitores",
-        teclados: "Teclados",
-        mouses: "Mouses",
-        impresoras: "Impresoras",
-        camaras: "Cámaras de Seguridad",
-        tablets: "Tablets",
-        accesorios: "Accesorios",
-        redes: "Redes",
-        componentes: "Componentes",
-        perifericos: "Periféricos",
-        almacenamiento: "Almacenamiento",
-        audio: "Audio",
-        // Soporte para categorías con guiones
-        'periféricos': "Periféricos",
-      },
       // Control de secciones de filtros abiertas/cerradas
       sectionsOpen: {
         category: true,
@@ -65,10 +47,10 @@ export default {
   },
   created() {
     this.isAuthenticated = !!localStorage.getItem("access_token");
-    const categoriaSlug = this.$route.params.categoria;
-    this.nombreCategoria =
-      this.categoriasInfo[categoriaSlug] || "Categoría Desconocida";
-    this.cargarProductos(categoriaSlug);
+    // El parámetro categoria ahora es el nombre exacto de la categoría (no un slug)
+    const categoriaParam = this.$route.params.categoria;
+    this.nombreCategoria = categoriaParam;
+    this.cargarProductos(categoriaParam);
   },
   methods: {
     cerrarSesion() {
@@ -80,29 +62,26 @@ export default {
       this.searchQuery = query;
       // Implementar lógica de búsqueda
     },
-    async cargarProductos(categoria) {
+    async cargarProductos(nombreCategoria) {
       try {
-        console.log('🔍 [DEBUG] Categoría slug recibida:', categoria);
+        console.log('🔍 Cargando productos para categoría:', nombreCategoria);
         
-        // Obtener el nombre de categoría formateado del mapping (ahora buscaremos por marca)
-        const categoriaFormateada = this.categoriasInfo[categoria] || 
-          categoria.charAt(0).toUpperCase() + categoria.slice(1);
-        
-        console.log('📦 [DEBUG] Buscando por marca:', categoriaFormateada);
-        
-        // Ahora buscamos por marca ya que el nuevo esquema no tiene categoría
-        const url = `/tienda/productos?marca=${encodeURIComponent(categoriaFormateada)}`;
-        console.log('🌐 [DEBUG] URL de petición:', url);
+        // Usar el nuevo endpoint con filtro de categoría
+        const url = `/tienda/productos?categoria=${encodeURIComponent(nombreCategoria)}`;
+        console.log('🌐 URL de petición:', url);
         
         const response = await apiClient.get(url);
         
-        console.log('✅ [DEBUG] Respuesta del servidor:', {
+        // La API devuelve { data: [...], total, page, limit, totalPages }
+        const productosArray = response.data.data || response.data;
+        
+        console.log('✅ Respuesta del servidor:', {
           status: response.status,
-          totalProductos: response.data.length,
-          primerProducto: response.data[0]
+          totalProductos: productosArray.length,
+          primerProducto: productosArray[0]
         });
         
-        this.productos = response.data.map(producto => {
+        this.productos = productosArray.map(producto => {
           // Obtener la ruta de la imagen (principal o primera disponible)
           let rutaImagen = '/Productos/placeholder-product.png';
           if (producto.productImages?.length > 0) {
@@ -118,16 +97,10 @@ export default {
           };
         });
         
-        console.log(`✅ Productos cargados para ${categoriaFormateada}:`, this.productos.length);
+        console.log(`✅ Productos cargados para ${nombreCategoria}:`, this.productos.length);
         
         if (this.productos.length === 0) {
-          console.warn('⚠️ No se encontraron productos para esta marca');
-          // Intentar cargar TODOS los productos para ver qué marcas existen
-          const todosResponse = await apiClient.get('/tienda/productos');
-          // La API devuelve { data: [...], total, page, limit, totalPages }
-          const todosProductos = todosResponse.data.data || todosResponse.data;
-          const marcasExistentes = [...new Set(todosProductos.map(p => p.marca))];
-          console.log('📋 Marcas disponibles en la BD:', marcasExistentes);
+          console.warn('⚠️ No se encontraron productos para esta categoría');
         }
       } catch (error) {
         console.error("❌ Error al cargar productos:", error);

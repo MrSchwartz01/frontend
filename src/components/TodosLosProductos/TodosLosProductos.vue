@@ -48,6 +48,22 @@
             </div>
           </div>
 
+          <!-- Filtro por Categoría -->
+          <div class="filtro-seccion" v-if="categoriasDisponibles.length > 0">
+            <h3>Categoría</h3>
+            <div class="filtro-opciones">
+              <label v-for="categoria in categoriasDisponibles" :key="categoria" class="checkbox-label">
+                <input
+                  type="checkbox"
+                  :value="categoria"
+                  v-model="filtros.categorias"
+                  @change="aplicarFiltros"
+                />
+                <span>{{ categoria }}</span>
+              </label>
+            </div>
+          </div>
+
           <!-- Filtro por Medida -->
           <div class="filtro-seccion">
             <h3>Medida</h3>
