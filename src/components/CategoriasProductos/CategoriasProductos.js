@@ -14,32 +14,6 @@ export default {
       searchQuery: "",
       isAuthenticated: false,
       categorias: [],
-      topProductos: [
-        {
-          id: "top-1",
-          ranking: 1,
-          nombre: "MacBook Pro 16\" M3",
-          marca: "Apple",
-          precio: "2499.99",
-          imagen_url: "/Productos/placeholder-product.png",
-        },
-        {
-          id: "top-2",
-          ranking: 2,
-          nombre: "Dell XPS 15",
-          marca: "Dell",
-          precio: "1899.99",
-          imagen_url: "/Productos/placeholder-product.png",
-        },
-        {
-          id: "top-3",
-          ranking: 3,
-          nombre: "Logitech MX Master 3S",
-          marca: "Logitech",
-          precio: "99.99",
-          imagen_url: "/Productos/placeholder-product.png",
-        },
-      ],
       cargandoCategorias: false,
     };
   },
@@ -118,9 +92,6 @@ export default {
     },
     irACategoria(slug) {
       this.$router.push({ name: "ProductosPorCategoria", params: { categoria: slug } });
-    },
-    verDetalle(id) {
-      this.$router.push({ name: "ProductoDetalle", params: { id } });
     },
   },
 };
