@@ -1,5 +1,12 @@
-.todos-productos-container {
+/* ===== Layout Global ===== */
+.page-layout {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.todos-productos-container {
+  flex: 1;
   background-color: #f5f5f5;
   padding-bottom: 40px;
 }

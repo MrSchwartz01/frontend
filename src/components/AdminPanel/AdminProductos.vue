@@ -56,7 +56,8 @@
     </div>
 
     <div class="resultados-info">
-      <span>Mostrando {{ productosFiltrados.length }} de {{ productos.length }} productos</span>
+      <span>Mostrando {{ indiceInicio }}-{{ indiceFin }} de {{ productosFiltrados.length }} productos</span>
+      <span v-if="productosFiltrados.length !== productos.length"> ({{ productos.length }} total)</span>
     </div>
 
     <!-- Lista de productos -->
@@ -64,7 +65,7 @@
 
     <div v-else class="productos-grid">
       <div
-        v-for="producto in productosFiltrados"
+        v-for="producto in productosPaginados"
         :key="producto.codigo"
         class="producto-card"
       >
@@ -98,6 +99,40 @@
             🖼️
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Controles de Paginación -->
+    <div v-if="!cargando && productosFiltrados.length > 0" class="paginacion">
+      <button 
+        @click="paginaAnterior" 
+        :disabled="paginaActual === 1"
+        class="btn-paginacion"
+      >
+        « Anterior
+      </button>
+
+      <div class="paginas-numeros">
+        <button
+          v-for="pagina in totalPaginas"
+          :key="pagina"
+          @click="irAPagina(pagina)"
+          :class="['btn-pagina', { activa: pagina === paginaActual }]"
+        >
+          {{ pagina }}
+        </button>
+      </div>
+
+      <button 
+        @click="paginaSiguiente" 
+        :disabled="paginaActual === totalPaginas"
+        class="btn-paginacion"
+      >
+        Siguiente »
+      </button>
+
+      <div class="info-pagina">
+        Página {{ paginaActual }} de {{ totalPaginas }}
       </div>
     </div>
 

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page-layout">
     <HeaderAnth
       :searchQuery="searchQuery"
       :isAuthenticated="isAuthenticated"

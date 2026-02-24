@@ -30,7 +30,26 @@ export default {
       // Opciones disponibles para filtros
       marcasDisponibles: [],
       medidasDisponibles: [],
+      // Paginación
+      paginaActual: 1,
+      productosPorPagina: 20,
     };
+  },
+  computed: {
+    totalPaginas() {
+      return Math.ceil(this.productosFiltrados.length / this.productosPorPagina);
+    },
+    productosPaginados() {
+      const inicio = (this.paginaActual - 1) * this.productosPorPagina;
+      const fin = inicio + this.productosPorPagina;
+      return this.productosFiltrados.slice(inicio, fin);
+    },
+    indiceInicio() {
+      return (this.paginaActual - 1) * this.productosPorPagina + 1;
+    },
+    indiceFin() {
+      return Math.min(this.paginaActual * this.productosPorPagina, this.productosFiltrados.length);
+    },
   },
   async mounted() {
     await this.cargarProductos();
@@ -143,6 +162,8 @@ export default {
       }
 
       this.productosFiltrados = resultado;
+      // Resetear a la primera página al aplicar filtros
+      this.paginaActual = 1;
     },
 
     limpiarFiltros() {
@@ -153,6 +174,30 @@ export default {
         stock: '',
       };
       this.productosFiltrados = [...this.productos];
+      this.paginaActual = 1;
+    },
+
+    irAPagina(pagina) {
+      if (pagina >= 1 && pagina <= this.totalPaginas) {
+        this.paginaActual = pagina;
+        // Scroll al inicio de la lista de productos
+        const element = document.querySelector('.productos-grid');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    },
+
+    paginaSiguiente() {
+      if (this.paginaActual < this.totalPaginas) {
+        this.irAPagina(this.paginaActual + 1);
+      }
+    },
+
+    paginaAnterior() {
+      if (this.paginaActual > 1) {
+        this.irAPagina(this.paginaActual - 1);
+      }
     },
 
     editarProducto(producto) {
