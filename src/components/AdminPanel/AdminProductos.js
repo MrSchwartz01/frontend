@@ -50,6 +50,60 @@ export default {
     indiceFin() {
       return Math.min(this.paginaActual * this.productosPorPagina, this.productosFiltrados.length);
     },
+    paginasVisibles() {
+      const total = this.totalPaginas;
+      const actual = this.paginaActual;
+      const paginas = [];
+
+      // Si hay 7 o menos páginas, mostrar todas
+      if (total <= 7) {
+        for (let i = 1; i <= total; i++) {
+          paginas.push(i);
+        }
+        return paginas;
+      }
+
+      // Siempre mostrar primera página
+      paginas.push(1);
+
+      // Calcular rango alrededor de la página actual
+      let inicio = Math.max(2, actual - 1);
+      let fin = Math.min(total - 1, actual + 1);
+
+      // Ajustar si estamos cerca del inicio
+      if (actual <= 3) {
+        fin = 5;
+      }
+
+      // Ajustar si estamos cerca del final
+      if (actual >= total - 2) {
+        inicio = total - 4;
+      }
+
+      // Agregar puntos suspensivos al inicio si es necesario
+      if (inicio > 2) {
+        paginas.push('...');
+      }
+
+      // Agregar páginas del rango
+      for (let i = inicio; i <= fin; i++) {
+        if (i > 1 && i < total) {
+          paginas.push(i);
+        }
+      }
+
+      // Agregar puntos suspensivos al final si es necesario
+      if (fin < total - 1) {
+        paginas.push('...');
+      }
+
+      // Siempre mostrar última página
+      if (total > 1) {
+        paginas.push(total);
+      }
+
+      return paginas;
+    },
   },
   async mounted() {
     await this.cargarProductos();

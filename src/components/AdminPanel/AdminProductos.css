@@ -588,6 +588,18 @@
   font-weight: bold;
 }
 
+.pagina-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: #7f8c8d;
+  font-size: 14px;
+  font-weight: bold;
+  user-select: none;
+}
+
 .info-pagina {
   color: #666;
   font-size: 14px;
@@ -628,6 +640,12 @@
     min-width: 36px;
     height: 36px;
     padding: 6px;
+    font-size: 13px;
+  }
+
+  .pagina-ellipsis {
+    min-width: 30px;
+    height: 36px;
     font-size: 13px;
   }
 

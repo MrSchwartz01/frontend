@@ -109,18 +109,20 @@
         :disabled="paginaActual === 1"
         class="btn-paginacion"
       >
-        « Anterior
+        ← Anterior
       </button>
 
       <div class="paginas-numeros">
-        <button
-          v-for="pagina in totalPaginas"
-          :key="pagina"
-          @click="irAPagina(pagina)"
-          :class="['btn-pagina', { activa: pagina === paginaActual }]"
-        >
-          {{ pagina }}
-        </button>
+        <template v-for="(pagina, index) in paginasVisibles" :key="index">
+          <button
+            v-if="pagina !== '...'"
+            @click="irAPagina(pagina)"
+            :class="['btn-pagina', { activa: pagina === paginaActual }]"
+          >
+            {{ pagina }}
+          </button>
+          <span v-else class="pagina-ellipsis">...</span>
+        </template>
       </div>
 
       <button 
@@ -128,7 +130,7 @@
         :disabled="paginaActual === totalPaginas"
         class="btn-paginacion"
       >
-        Siguiente »
+        Siguiente →
       </button>
 
       <div class="info-pagina">
