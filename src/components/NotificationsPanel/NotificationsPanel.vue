@@ -2,7 +2,7 @@
   <div class="notifications-panel">
     <div class="notifications-header">
       <h2>
-        <span class="icon">🔔</span>
+        <span class="icon"><FontAwesomeIcon :icon="['far', 'bell']" /></span>
         Notificaciones
         <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
       </h2>

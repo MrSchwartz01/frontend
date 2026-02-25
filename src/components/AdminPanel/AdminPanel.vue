@@ -69,21 +69,34 @@
                   class="search-input"
                   @focus="mostrarListaProductosPromo = true"
                 />
-                <select 
-                  v-model="promotionForm.producto_id" 
-                  required 
-                  @focus="mostrarListaProductosPromo = true"
-                  :size="mostrarListaProductosPromo ? 8 : 1"
-                >
-                  <option value="">Seleccione un producto</option>
-                  <option 
-                    v-for="producto in productosFiltradosPromocion" 
-                    :key="producto.codigo" 
-                    :value="producto.codigo"
+                <div class="select-with-close">
+                  <select 
+                    v-model="promotionForm.producto_id" 
+                    required 
+                    @focus="mostrarListaProductosPromo = true"
+                    @blur="cerrarSelectorPromocionDespuesDeDelay"
+                    @change="cerrarSelectorPromocion"
+                    :size="mostrarListaProductosPromo ? 8 : 1"
                   >
-                    [{{ producto.codigo }}] {{ producto.producto }} - ${{ producto.precioUnitario?.precioA || producto.costoTotal || 0 }}
-                  </option>
-                </select>
+                    <option value="">Seleccione un producto</option>
+                    <option 
+                      v-for="producto in productosFiltradosPromocion" 
+                      :key="producto.codigo" 
+                      :value="producto.codigo"
+                    >
+                      [{{ producto.codigo }}] {{ producto.producto }} - ${{ producto.precioUnitario?.precioA || producto.costoTotal || 0 }}
+                    </option>
+                  </select>
+                  <button 
+                    v-if="mostrarListaProductosPromo" 
+                    type="button" 
+                    class="btn-close-selector"
+                    @click="cerrarSelectorPromocion"
+                    title="Cerrar selector"
+                  >
+                    ✕
+                  </button>
+                </div>
                 <small class="helper-text">
                   {{ productosFiltradosPromocion.length }} productos encontrados
                 </small>
@@ -180,9 +193,9 @@
                   </span>
                 </td>
                 <td class="actions">
-                  <button v-if="puedeEditarPromocion()" @click="editPromotion(promo)" class="btn-icon" title="Editar">✏️</button>
-                  <button v-if="puedeEditarPromocion()" @click="deletePromotion(promo.id)" class="btn-icon" title="Eliminar">🗑️</button>
-                  <span v-if="isVendedor && !permisosVendedor.promociones" class="readonly-badge">👁️ Solo lectura</span>
+                  <button v-if="puedeEditarPromocion()" @click="editPromotion(promo)" class="btn-icon" title="Editar"><FontAwesomeIcon :icon="['fas', 'pencil']" /></button>
+                  <button v-if="puedeEditarPromocion()" @click="deletePromotion(promo.id)" class="btn-icon" title="Eliminar"><FontAwesomeIcon :icon="['fas', 'trash']" /></button>
+                  <span v-if="isVendedor && !permisosVendedor.promociones" class="readonly-badge"><FontAwesomeIcon :icon="['fas', 'eye']" /> Solo lectura</span>
                 </td>
               </tr>
             </tbody>
@@ -224,20 +237,33 @@
                   class="search-input"
                   @focus="mostrarListaProductos = true"
                 />
-                <select 
-                  v-model="bannerForm.producto_id" 
-                  @focus="mostrarListaProductos = true"
-                  :size="mostrarListaProductos ? 8 : 1"
-                >
-                  <option :value="null">Sin asociar</option>
-                  <option 
-                    v-for="producto in productosFiltradosBanner" 
-                    :key="producto.codigo" 
-                    :value="producto.codigo"
+                <div class="select-with-close">
+                  <select 
+                    v-model="bannerForm.producto_id" 
+                    @focus="mostrarListaProductos = true"
+                    @blur="cerrarSelectorBannerDespuesDeDelay"
+                    @change="cerrarSelectorBanner"
+                    :size="mostrarListaProductos ? 8 : 1"
                   >
-                    [{{ producto.codigo }}] {{ producto.producto }}
-                  </option>
-                </select>
+                    <option :value="null">Sin asociar</option>
+                    <option 
+                      v-for="producto in productosFiltradosBanner" 
+                      :key="producto.codigo" 
+                      :value="producto.codigo"
+                    >
+                      [{{ producto.codigo }}] {{ producto.producto }}
+                    </option>
+                  </select>
+                  <button 
+                    v-if="mostrarListaProductos" 
+                    type="button" 
+                    class="btn-close-selector"
+                    @click="cerrarSelectorBanner"
+                    title="Cerrar selector"
+                  >
+                    ✕
+                  </button>
+                </div>
                 <small class="helper-text">
                   {{ productosFiltradosBanner.length }} productos encontrados
                 </small>
@@ -477,19 +503,19 @@
                 <td>{{ formatDate(user.fecha_creacion) }}</td>
                 <td>{{ user.ultimo_acceso ? formatDate(user.ultimo_acceso) : 'Nunca' }}</td>
                 <td class="actions">
-                  <button v-if="isAdmin" @click="editUser(user)" class="btn-icon" title="Editar">✏️</button>
+                  <button v-if="isAdmin" @click="editUser(user)" class="btn-icon" title="Editar"><FontAwesomeIcon :icon="['fas', 'pencil']" /></button>
                   <button 
                     v-if="isAdmin && !isCurrentUser(user.id)" 
                     @click="openResetPasswordModal(user)" 
                     class="btn-icon btn-warning" 
                     title="Resetear Contraseña"
-                  >🔑</button>
+                  ><FontAwesomeIcon :icon="['fas', 'key']" /></button>
                   <button 
                     v-if="isAdmin && !isCurrentUser(user.id)" 
                     @click="deleteUser(user.id)" 
                     class="btn-icon" 
                     title="Eliminar"
-                  >🗑️</button>
+                  ><FontAwesomeIcon :icon="['fas', 'trash']" /></button>
                   <span v-if="isCurrentUser(user.id)" class="readonly-badge">👤 Tú</span>
                 </td>
               </tr>
@@ -648,19 +674,19 @@
                     @click="editPermiso(permiso)" 
                     class="btn-icon" 
                     title="Editar"
-                  >✏️</button>
+                  ><FontAwesomeIcon :icon="['fas', 'pencil']" /></button>
                   <button 
                     v-if="isAdmin && permiso.activo && !isPermisoExpirado(permiso)"
                     @click="revocarPermiso(permiso.id)" 
                     class="btn-icon btn-warning" 
                     title="Revocar"
-                  >🚫</button>
+                  ><FontAwesomeIcon :icon="['fas', 'ban']" /></button>
                   <button 
                     v-if="isAdmin"
                     @click="deletePermiso(permiso.id)" 
                     class="btn-icon" 
                     title="Eliminar"
-                  >🗑️</button>
+                  ><FontAwesomeIcon :icon="['fas', 'trash']" /></button>
                 </td>
               </tr>
             </tbody>

@@ -108,7 +108,14 @@ export default {
 
         // Registrar en historial de productos vistos (Vuex + localStorage)
         if (this.$store) {
-          this.$store.dispatch('registrarProductoVisto', this.producto);
+          // Agregar la imagen_url al producto antes de registrarlo
+          const productoConImagen = {
+            ...this.producto,
+            imagen_url: this.imagenes.length > 0 
+              ? this.imagenes[0].ruta_imagen 
+              : '/Productos/placeholder-product.png'
+          };
+          this.$store.dispatch('registrarProductoVisto', productoConImagen);
         }
 
         // Cargar productos relacionados de la misma marca

@@ -201,6 +201,47 @@
   font-style: italic;
 }
 
+/* Container para select con botón de cerrar */
+.select-with-close {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.select-with-close select {
+  flex: 1;
+}
+
+.btn-close-selector {
+  padding: 8px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.btn-close-selector:hover {
+  background: #c82333;
+  transform: scale(1.05);
+  box-shadow: 0 3px 6px rgba(220, 53, 69, 0.4);
+}
+
+.btn-close-selector:active {
+  transform: scale(0.98);
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

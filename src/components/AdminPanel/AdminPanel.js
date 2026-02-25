@@ -987,6 +987,29 @@ export default {
       if (!text) return '';
       return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
     },
+
+    // Métodos para cerrar selectores de productos
+    cerrarSelectorPromocion() {
+      this.mostrarListaProductosPromo = false;
+    },
+
+    cerrarSelectorBanner() {
+      this.mostrarListaProductos = false;
+    },
+
+    cerrarSelectorPromocionDespuesDeDelay() {
+      // Delay para permitir que el evento change se ejecute primero
+      setTimeout(() => {
+        this.mostrarListaProductosPromo = false;
+      }, 200);
+    },
+
+    cerrarSelectorBannerDespuesDeDelay() {
+      // Delay para permitir que el evento change se ejecute primero
+      setTimeout(() => {
+        this.mostrarListaProductos = false;
+      }, 200);
+    },
   },
 
   computed: {

@@ -1,7 +1,7 @@
 <template>
   <div class="notifications-bell">
     <button @click="toggleDropdown" class="bell-button">
-      🔔
+      <FontAwesomeIcon :icon="['far', 'bell']" />
       <span v-if="unreadCount > 0" class="badge">{{ unreadCount }}</span>
     </button>
 

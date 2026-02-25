@@ -10,8 +10,9 @@
       >
         <img
           class="historial-imagen"
-          :src="producto.imagen_url || 'ruta-imagen-default.png'"
+          :src="getImageUrl(producto)"
           :alt="producto.producto || 'Producto visto recientemente'"
+          @error="handleImageError"
         />
         <div class="historial-info">
           <p class="historial-nombre">{{ producto.producto || 'Producto' }}</p>
