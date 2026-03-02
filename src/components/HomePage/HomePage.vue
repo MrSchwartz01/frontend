@@ -17,19 +17,26 @@
           <div class="banner-container">
             <CarouselBanner :banners="banners" />
           </div>
-          <!-- Contenedor de Video Destacado -->
+          <!-- Contenedor de Video / Playlist -->
           <div class="video-featured-container">
             <div class="video-wrapper">
-              <!-- Puedes cambiar este iframe por el video que desees -->
               <iframe
-                :src="videoDestacado"
+                :key="currentVideoIndex"
+                :src="currentVideoEmbedUrl"
                 frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
                 title="Video destacado"
               ></iframe>
             </div>
-            <div class="video-info">
+            <!-- Controles de playlist (solo si hay más de 1 video) -->
+            <div v-if="videoPlaylist.length > 1" class="video-playlist-controls">
+              <button class="vp-btn" @click="prevVideo" title="Video anterior">&#8249;</button>
+              <div class="vp-info">
+                <span class="vp-titulo">{{ currentVideo?.titulo }}</span>
+                <span class="vp-pager">{{ currentVideoIndex + 1 }} / {{ videoPlaylist.length }}</span>
+              </div>
+              <button class="vp-btn" @click="nextVideo" title="Siguiente video">&#8250;</button>
             </div>
           </div>
         

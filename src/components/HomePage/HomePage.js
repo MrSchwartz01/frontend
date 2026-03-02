@@ -30,10 +30,10 @@ export default {
       // Video destacado - Se cargará desde la API
       videoDestacado: "",
 
-
-      
-      videoTitulo: "Laptop Gaming de Última Generación",
-      videoDescripcion: "Conoce las características y rendimiento de nuestro producto estrella",
+      // Playlist de videos
+      videoPlaylist: [],
+      currentVideoIndex: 0,
+      videoTimer: null,
       
       // Datos de categorías más visitadas (se cargarán desde la API)
       categoriasMasVisitadas: [],
@@ -67,15 +67,22 @@ export default {
         ];
       }
 
-      // Cargar Video Destacado desde la API
+      // Cargar Playlist de Videos desde la API
       try {
-        const videoResponse = await apiClient.get('/configuracion/video-destacado/url');
-        this.videoDestacado = videoResponse.data.valor || '';
-        console.log('Video destacado cargado:', this.videoDestacado);
+        const playlistResponse = await apiClient.get('/configuracion/video-playlist');
+        const playlist = playlistResponse.data.valor || [];
+        if (playlist.length > 0) {
+          this.videoPlaylist = playlist;
+          this.videoDestacado = this.buildEmbedUrl(playlist[0].url);
+          this.startVideoTimer();
+        } else {
+          // Fallback al endpoint antiguo
+          const videoResponse = await apiClient.get('/configuracion/video-destacado/url');
+          this.videoDestacado = videoResponse.data.valor || '';
+        }
       } catch (videoError) {
-        console.error('Error al cargar video destacado:', videoError);
-        // Fallback a video por defecto si falla la API
-        this.videoDestacado = 'https://www.youtube.com/embed/r-DF3-FS_6k?si=DW930ua3fe_K9GjD&autoplay=1&mute=1&loop=1&playlist=r-DF3-FS_6k';
+        console.error('Error al cargar playlist:', videoError);
+        this.videoDestacado = 'https://www.youtube.com/embed/r-DF3-FS_6k?autoplay=1&mute=1&loop=1&playlist=r-DF3-FS_6k';
       }
 
       // Cargar Productos
@@ -143,6 +150,14 @@ export default {
     }
   },
   computed: {
+    currentVideo() {
+      if (this.videoPlaylist.length === 0) return null;
+      return this.videoPlaylist[this.currentVideoIndex] || this.videoPlaylist[0];
+    },
+    currentVideoEmbedUrl() {
+      if (this.currentVideo) return this.buildEmbedUrl(this.currentVideo.url);
+      return this.videoDestacado;
+    },
     productosDestacados() {
       if (!this.productos || this.productos.length === 0) return [];
 
@@ -153,7 +168,50 @@ export default {
       return base.slice(0, 8);
     },
   },
+  beforeUnmount() {
+    this.stopVideoTimer();
+  },
   methods: {
+    // ===== PLAYLIST =====
+    buildEmbedUrl(baseUrl) {
+      try {
+        const url = new URL(baseUrl);
+        url.searchParams.set('autoplay', '1');
+        url.searchParams.set('mute', '1');
+        const videoId = baseUrl.match(/\/embed\/([^?&]+)/)?.[1];
+        if (videoId) url.searchParams.set('playlist', videoId);
+        return url.toString();
+      } catch { return baseUrl; }
+    },
+    nextVideo() {
+      if (this.videoPlaylist.length <= 1) return;
+      this.currentVideoIndex = (this.currentVideoIndex + 1) % this.videoPlaylist.length;
+      this.restartVideoTimer();
+    },
+    prevVideo() {
+      if (this.videoPlaylist.length <= 1) return;
+      this.currentVideoIndex = (this.currentVideoIndex - 1 + this.videoPlaylist.length) % this.videoPlaylist.length;
+      this.restartVideoTimer();
+    },
+    startVideoTimer() {
+      this.stopVideoTimer();
+      const current = this.videoPlaylist[this.currentVideoIndex];
+      if (!current || this.videoPlaylist.length <= 1) return;
+      const secs = (current.duracion_segundos || 30) * 1000;
+      this.videoTimer = setTimeout(() => {
+        this.nextVideo();
+      }, secs);
+    },
+    restartVideoTimer() {
+      this.stopVideoTimer();
+      this.startVideoTimer();
+    },
+    stopVideoTimer() {
+      if (this.videoTimer) {
+        clearTimeout(this.videoTimer);
+        this.videoTimer = null;
+      }
+    },
     aplicarPromocionesAProductos() {
       // Agregar información de promoción a cada producto
       this.productos = this.productos.map(producto => {

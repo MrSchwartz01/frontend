@@ -294,8 +294,14 @@
               <img :src="banner.imagen_url" :alt="banner.titulo" />
               <div class="banner-info">
                 <h4>{{ banner.titulo }}</h4>
-                <p v-if="banner.producto">Asociado a: {{ banner.producto.nombre_producto }}</p>
-                <p v-else>Sin producto asociado</p>
+                <div v-if="banner.producto" class="banner-producto-info">
+                  <span class="producto-codigo">
+                    <FontAwesomeIcon :icon="['fas', 'tag']" />
+                    {{ banner.producto.codigo }}
+                  </span>
+                  <span class="producto-nombre">{{ banner.producto.producto }}</span>
+                </div>
+                <p v-else class="banner-sin-producto">Sin producto asociado</p>
                 <div class="banner-actions">
                   <button v-if="puedeEditarBanner()" @click="editBanner(banner)" class="btn-small">Editar</button>
                   <button v-if="puedeEditarBanner()" @click="deleteBanner(banner.id)" class="btn-small btn-danger">Eliminar</button>

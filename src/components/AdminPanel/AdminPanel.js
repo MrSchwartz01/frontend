@@ -367,6 +367,11 @@ export default {
         imagen_url: banner.imagen_url,
         producto_id: banner.producto_id,
       };
+      if (banner.producto) {
+        this.busquedaProductoBanner = `[${banner.producto.codigo}] ${banner.producto.producto}`;
+      } else {
+        this.busquedaProductoBanner = '';
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
 
