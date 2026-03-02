@@ -1,7 +1,7 @@
 <template>
   <div class="admin-metricas">
     <div class="metricas-header">
-      <h2>📊 Métricas de Visitas</h2>
+      <h2><FontAwesomeIcon :icon="['far', 'eye']" /> Métricas de Visitas</h2>
       <div class="controles">
         <div class="periodo-selector">
           <label>Período:</label>
@@ -20,21 +20,21 @@
             @click="setModo('clientes')"
             title="Solo visitas de clientes (excluye staff)"
           >
-            👤 Clientes
+            <FontAwesomeIcon :icon="['fas', 'person']" /> Clientes
           </button>
           <button
             :class="['btn-modo', { active: modoVista === 'staff' }]"
             @click="setModo('staff')"
             title="Solo visitas de personal interno"
           >
-            👔 Staff
+            <FontAwesomeIcon :icon="['fas', 'shield']" /> Staff
           </button>
           <button
             :class="['btn-modo', { active: modoVista === 'todos' }]"
             @click="setModo('todos')"
             title="Todas las visitas sin filtrar"
           >
-            🌐 Todos
+            <FontAwesomeIcon :icon="['far', 'eye']" /> Todos
           </button>
         </div>
       </div>
@@ -58,13 +58,13 @@
     <!-- Badge de modo activo -->
     <div class="modo-badge" :class="'modo-' + modoVista">
       <span v-if="modoVista === 'clientes'">
-        👤 Mostrando visitas de clientes (administradores, vendedores y técnicos excluidos)
+        <FontAwesomeIcon :icon="['fas', 'person']" /> Mostrando visitas de clientes (administradores, vendedores y técnicos excluidos)
       </span>
       <span v-else-if="modoVista === 'staff'">
-        👔 Mostrando visitas de personal interno únicamente (admin, vendedor, técnico)
+        <FontAwesomeIcon :icon="['fas', 'shield']" /> Mostrando visitas de personal interno únicamente (admin, vendedor, técnico)
       </span>
       <span v-else>
-        🌐 Mostrando todas las visitas
+        <FontAwesomeIcon :icon="['far', 'eye']" /> Mostrando todas las visitas
         <span v-if="rolesExcluidos.length > 0"> · Excluidos: {{ rolesExcluidos.join(', ') }}</span>
       </span>
     </div>
@@ -86,7 +86,7 @@
       <!-- Cards de Resumen -->
       <div class="stats-cards">
         <div class="stat-card">
-          <div class="stat-icon">👁️</div>
+          <div class="stat-icon"><FontAwesomeIcon :icon="['far', 'eye']" /></div>
           <div class="stat-info">
             <h3>{{ overview.totalPageViews?.toLocaleString() || 0 }}</h3>
             <p>Visitas a Páginas</p>
@@ -94,7 +94,7 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon"><FontAwesomeIcon :icon="['fas', 'person']" /></div>
           <div class="stat-info">
             <h3>{{ overview.uniqueVisitors?.toLocaleString() || 0 }}</h3>
             <p>Visitantes Únicos</p>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon">🛍️</div>
+          <div class="stat-icon"><FontAwesomeIcon :icon="['fas', 'tag']" /></div>
           <div class="stat-info">
             <h3>{{ overview.totalProductViews?.toLocaleString() || 0 }}</h3>
             <p>Productos Vistos</p>
@@ -110,7 +110,7 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon">🏷️</div>
+          <div class="stat-icon"><FontAwesomeIcon :icon="['fas', 'tag']" /></div>
           <div class="stat-info">
             <h3>{{ overview.totalBrandViews?.toLocaleString() || 0 }}</h3>
             <p>Marcas Vistas</p>
@@ -118,7 +118,7 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon">⚡</div>
+          <div class="stat-icon"><FontAwesomeIcon :icon="['fas', 'bolt-lightning']" /></div>
           <div class="stat-info">
             <h3>{{ overview.totalInteractions?.toLocaleString() || 0 }}</h3>
             <p>Interacciones Totales</p>
@@ -128,7 +128,7 @@
 
       <!-- Gráfico de Visitas por Fecha -->
       <div class="chart-section" v-if="pageViewsStats.viewsByDate">
-        <h3>📈 Visitas por Día</h3>
+        <h3><FontAwesomeIcon :icon="['far', 'eye']" /> Visitas por Día</h3>
         <div class="simple-chart">
           <div
             v-for="(visita, index) in pageViewsStats.viewsByDate.visitas"
@@ -217,7 +217,7 @@
 
       <!-- Top Marcas Vistas -->
       <div class="table-section" v-if="brandViewsStats.topBrands && brandViewsStats.topBrands.length > 0">
-        <h3>🏷️ Marcas Más Vistas</h3>
+        <h3><FontAwesomeIcon :icon="['fas', 'tag']" /> Marcas Más Vistas</h3>
         <table class="data-table">
           <thead>
             <tr>
@@ -248,7 +248,7 @@
 
       <!-- Empty State -->
       <div v-if="!hasData" class="empty-state">
-        <p>📊 No hay datos de métricas disponibles para el período seleccionado.</p>
+        <p><FontAwesomeIcon :icon="['far', 'eye']" /> No hay datos de métricas disponibles para el período seleccionado.</p>
       </div>
     </div>
   </div>

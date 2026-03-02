@@ -20,7 +20,7 @@
           @click="activeTab = tab.id"
           :title="tab.label"
         >
-          <span class="nav-icon">{{ tab.icon }}</span>
+          <span class="nav-icon"><FontAwesomeIcon :icon="tab.icon" /></span>
           <span class="nav-label">{{ tab.label }}</span>
         </button>
       </nav>

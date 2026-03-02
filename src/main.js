@@ -9,7 +9,8 @@ import './config/axiosConfig';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { 
-  faBell as farBell 
+  faBell as farBell,
+  faEye as farEye
 } from '@fortawesome/free-regular-svg-icons';
 import { 
   faPencil, 
@@ -18,11 +19,27 @@ import {
   faTrash,
   faKey,
   faBan,
-  faEye
+  faEye,
+  faBox,
+  faTag,
+  faShield,
+  faImage,
+  faPalette,
+  faLock,
+  faVideo,
+  faGear,
+  faPerson,
+  faBoltLightning,
+  faChartBar
 } from '@fortawesome/free-solid-svg-icons';
 
 // Agregar iconos a la librería
-library.add(farBell, faPencil, faArrowsRotate, fasBell, faTrash, faKey, faBan, faEye);
+library.add(
+  farBell, farEye,
+  faPencil, faArrowsRotate, fasBell, faTrash, faKey, faBan, faEye,
+  faBox, faTag, faShield, faImage, faPalette, faLock, faVideo,
+  faGear, faPerson, faBoltLightning, faChartBar
+);
 
 // Importar configuración de Axios con interceptor
 // Asegúrate de que esta URL coincida con tu backend
