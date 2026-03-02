@@ -561,6 +561,7 @@
   margin-top: 40px;
   padding-top: 30px;
   border-top: 2px solid #f0f0f0;
+  flex-wrap: wrap;
 }
 
 .pagina-btn {
@@ -585,10 +586,109 @@
   cursor: not-allowed;
 }
 
+.paginas-numeros {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagina-numero-btn {
+  min-width: 42px;
+  height: 42px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #555;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagina-numero-btn:hover {
+  background-color: #fff5e6;
+  border-color: #FF8000;
+  color: #FF8000;
+}
+
+.pagina-numero-btn.activa {
+  background-color: #FF8000;
+  border-color: #FF8000;
+  color: white;
+}
+
+.pagina-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  color: #999;
+  font-size: 0.9rem;
+  font-weight: bold;
+  user-select: none;
+}
+
+.pagina-info-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 .pagina-info {
   font-size: 0.95rem;
   color: #666;
   font-weight: 500;
+  white-space: nowrap;
+}
+
+.ir-a-pagina {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ir-a-pagina label {
+  font-size: 0.9rem;
+  color: #666;
+  white-space: nowrap;
+}
+
+.pagina-input {
+  width: 65px;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.pagina-input:focus {
+  outline: none;
+  border-color: #FF8000;
+  box-shadow: 0 0 0 3px rgba(255, 128, 0, 0.1);
+}
+
+.btn-ir {
+  padding: 8px 14px;
+  background: #FF8000;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-ir:hover {
+  background: #e67300;
+  transform: translateX(2px);
 }
 
 /* Responsive */
@@ -650,6 +750,41 @@
 
   .paginacion {
     flex-direction: column;
+    gap: 15px;
+  }
+
+  .paginas-numeros {
+    order: 1;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pagina-numero-btn {
+    min-width: 38px;
+    height: 38px;
+    font-size: 0.85rem;
+  }
+
+  .pagina-info-container {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+    flex-direction: column;
     gap: 10px;
+  }
+
+  .ir-a-pagina {
+    justify-content: center;
+  }
+
+  .pagina-input {
+    width: 55px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
+
+  .btn-ir {
+    padding: 6px 12px;
+    font-size: 0.85rem;
   }
 }

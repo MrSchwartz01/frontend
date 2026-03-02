@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import authService from '../services/auth';
+import analyticsService from '../services/analytics';
 import SesionUsuario from '../components/SesionUsuario/SesionUsuario.vue';
 import RegistroUsuario from '../components/RegistroUsuario/RegistroUsuario.vue';
 import Home from '../components/HomePage/HomePage.vue';
@@ -338,6 +339,12 @@ router.beforeEach((to, from, next) => {
 // Manejo de errores globales de navegación
 router.onError((error) => {
   console.error('Router error:', error);
+});
+
+// Tracking de Analytics - Trackear cada cambio de página
+router.afterEach((to) => {
+  // Trackear la visita a la página
+  analyticsService.trackPageView(to.path);
 });
 
 export default router;

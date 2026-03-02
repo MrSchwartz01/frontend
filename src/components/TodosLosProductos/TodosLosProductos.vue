@@ -217,7 +217,20 @@
             >
               ← Anterior
             </button>
-            <span class="pagina-info">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+
+            <div class="paginas-numeros">
+              <template v-for="(pagina, index) in paginasVisibles" :key="index">
+                <button
+                  v-if="pagina !== '...'"
+                  @click="cambiarPagina(pagina)"
+                  :class="['pagina-numero-btn', { activa: pagina === paginaActual }]"
+                >
+                  {{ pagina }}
+                </button>
+                <span v-else class="pagina-ellipsis">...</span>
+              </template>
+            </div>
+
             <button 
               @click="cambiarPagina(paginaActual + 1)" 
               :disabled="paginaActual === totalPaginas"
@@ -225,6 +238,25 @@
             >
               Siguiente →
             </button>
+
+            <div class="pagina-info-container">
+              <span class="pagina-info">Página {{ paginaActual }} de {{ totalPaginas }}</span>
+              <div class="ir-a-pagina">
+                <label>Ir a:</label>
+                <input
+                  type="number"
+                  v-model.number="paginaInput"
+                  @keyup.enter="irAPaginaInput"
+                  :min="1"
+                  :max="totalPaginas"
+                  placeholder="#"
+                  class="pagina-input"
+                />
+                <button @click="irAPaginaInput" class="btn-ir" title="Ir a página">
+                  →
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

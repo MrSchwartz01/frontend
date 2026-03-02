@@ -33,6 +33,7 @@ export default {
       // Paginación
       paginaActual: 1,
       productosPorPagina: 20,
+      paginaInput: null,
     };
   },
   computed: {
@@ -251,6 +252,15 @@ export default {
     paginaAnterior() {
       if (this.paginaActual > 1) {
         this.irAPagina(this.paginaActual - 1);
+      }
+    },
+
+    irAPaginaInput() {
+      if (this.paginaInput && this.paginaInput >= 1 && this.paginaInput <= this.totalPaginas) {
+        this.irAPagina(this.paginaInput);
+        this.paginaInput = null; // Limpiar el input después de navegar
+      } else if (this.paginaInput) {
+        alert(`Por favor ingresa un número entre 1 y ${this.totalPaginas}`);
       }
     },
 

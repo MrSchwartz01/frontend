@@ -134,7 +134,22 @@
       </button>
 
       <div class="info-pagina">
-        Página {{ paginaActual }} de {{ totalPaginas }}
+        <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <div class="ir-a-pagina">
+          <label>Ir a:</label>
+          <input
+            type="number"
+            v-model.number="paginaInput"
+            @keyup.enter="irAPaginaInput"
+            :min="1"
+            :max="totalPaginas"
+            placeholder="#"
+            class="pagina-input"
+          />
+          <button @click="irAPaginaInput" class="btn-ir" title="Ir a página">
+            →
+          </button>
+        </div>
       </div>
     </div>
 

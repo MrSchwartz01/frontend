@@ -354,6 +354,11 @@
         <AdminPersonalizacion />
       </div>
 
+      <!-- Tab de Métricas -->
+      <div v-if="activeTab === 'metricas' && isAdmin" class="tab-panel">
+        <AdminMetricas />
+      </div>
+
       <!-- Tab de Usuarios -->
       <div v-if="activeTab === 'usuarios' && isAdmin" class="tab-panel">
         <h2>Gestión de Usuarios</h2>

@@ -4,6 +4,7 @@ import AdminProductos from './AdminProductos.vue';
 import AdminGarantias from './AdminGarantias.vue';
 import AdminPersonalizacion from './AdminPersonalizacion.vue';
 import AdminVideo from './AdminVideo.vue';
+import AdminMetricas from './AdminMetricas.vue';
 import NotificationsPanel from '../NotificationsPanel/NotificationsPanel.vue';
 import NotificationsBell from '../NotificationsPanel/NotificationsBell.vue';
 
@@ -14,6 +15,7 @@ export default {
     AdminGarantias,
     AdminPersonalizacion,
     AdminVideo,
+    AdminMetricas,
     NotificationsPanel,
     NotificationsBell,
   },
@@ -28,6 +30,7 @@ export default {
         { id: 'banners', label: 'Banners' },
         { id: 'video', label: 'Video' },
         { id: 'logo', label: 'Logo' },
+        { id: 'metricas', label: 'Métricas' },
         { id: 'personalizacion', label: 'Personalización' },
         { id: 'usuarios', label: 'Usuarios' },
         { id: 'permisos', label: 'Permisos Temporales' },

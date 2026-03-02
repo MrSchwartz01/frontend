@@ -601,10 +601,57 @@
 }
 
 .info-pagina {
+  display: flex;
+  align-items: center;
+  gap: 15px;
   color: #666;
   font-size: 14px;
   margin-left: 10px;
   white-space: nowrap;
+  flex-wrap: wrap;
+}
+
+.ir-a-pagina {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ir-a-pagina label {
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.pagina-input {
+  width: 60px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.pagina-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.btn-ir {
+  padding: 6px 12px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.btn-ir:hover {
+  background: #2980b9;
 }
 
 /* Responsive */
@@ -653,6 +700,22 @@
     width: 100%;
     text-align: center;
     margin-left: 0;
-    margin-top: 5px;
+    margin-top: 10px;
+    justify-content: center;
+  }
+
+  .ir-a-pagina {
+    justify-content: center;
+  }
+
+  .pagina-input {
+    width: 50px;
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+
+  .btn-ir {
+    padding: 5px 10px;
+    font-size: 13px;
   }
 }
