@@ -54,38 +54,86 @@
   width: 140px; /* Mismo ancho aproximado del botón para centrar el título */
 }
 
-/* Tabs */
-.tabs {
+/* =============================================
+   Panel Body: sidebar + contenido
+   ============================================= */
+.panel-body {
   display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #e0e0e0;
+  gap: 0;
+  min-height: 600px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.tab-button {
-  padding: 12px 24px;
+/* Sidebar de navegación compacto */
+.sidebar-nav {
+  width: 150px;
+  min-width: 150px;
+  background: #f4f6f9;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  gap: 1px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 6px;
   border: none;
-  background: none;
+  background: transparent;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  color: #666;
-  border-bottom: 3px solid transparent;
-  transition: all 0.3s ease;
+  color: #555;
+  border-radius: 0;
+  transition: background 0.2s, color 0.2s;
+  text-align: center;
+  width: 100%;
+  border-left: 3px solid transparent;
 }
 
-.tab-button:hover {
-  color: #0066cc;
+.nav-item:hover {
+  background: #e8f0fe;
+  color: #0052a3;
+  border-left-color: #80aadd;
 }
 
-.tab-button.active {
+.nav-item.active {
+  background: linear-gradient(90deg, #e3edfc 0%, #f4f6f9 100%);
   color: #0066cc;
-  border-bottom-color: #0066cc;
+  font-weight: 700;
+  border-left-color: #0066cc;
+}
+
+.nav-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nav-label {
+  font-size: 11px;
+  line-height: 1.2;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 /* Tab Content */
+.tab-content {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+  background: #fff;
+  min-width: 0;
+}
+
+/* Tab Panel */
 .tab-panel {
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.25s ease;
 }
 
 @keyframes fadeIn {
@@ -656,6 +704,42 @@
 }
 
 @media (max-width: 768px) {
+  .panel-body {
+    flex-direction: column;
+  }
+
+  .sidebar-nav {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .nav-item {
+    min-width: 65px;
+    padding: 7px 4px;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+  }
+
+  .nav-item.active {
+    border-left-color: transparent;
+    border-bottom-color: #0066cc;
+  }
+
+  .nav-item:hover {
+    border-left-color: transparent;
+    border-bottom-color: #80aadd;
+  }
+
+  .tab-content {
+    padding: 12px;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }

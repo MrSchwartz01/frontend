@@ -10,25 +10,22 @@
       <NotificationsBell v-if="isAuthenticated" />
     </div>
 
-    <div class="tabs">
-      <button
-        v-for="tab in visibleTabs"
-        :key="tab.id"
-        :class="['tab-button', { active: activeTab === tab.id }]"
-        @click="activeTab = tab.id"
-      >
-        {{ tab.label }}
-      </button>
-      <!-- Agregar tab de notificaciones -->
-      <button
-        :class="['tab-button', { active: activeTab === 'notificaciones' }]"
-        @click="activeTab = 'notificaciones'"
-      >
-        Notificaciones
-      </button>
-    </div>
+    <div class="panel-body">
+      <!-- Sidebar de navegación compacto -->
+      <nav class="sidebar-nav">
+        <button
+          v-for="tab in visibleTabs"
+          :key="tab.id"
+          :class="['nav-item', { active: activeTab === tab.id }]"
+          @click="activeTab = tab.id"
+          :title="tab.label"
+        >
+          <span class="nav-icon">{{ tab.icon }}</span>
+          <span class="nav-label">{{ tab.label }}</span>
+        </button>
+      </nav>
 
-    <div class="tab-content">
+      <div class="tab-content">
       <!-- Tab de Notificaciones -->
       <div v-if="activeTab === 'notificaciones'" class="tab-panel">
         <NotificationsPanel />
@@ -699,6 +696,7 @@
         </div>
       </div>
     </div>
+    </div><!-- /.panel-body -->
 
     <!-- Modal para Resetear Contraseña -->
     <div v-if="showResetPasswordModal" class="modal-overlay" @click.self="closeResetPasswordModal">

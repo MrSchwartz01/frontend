@@ -72,11 +72,12 @@ class AnalyticsService {
   }
 
   // Obtener métricas de visitas (solo para admin)
-  async getVisitorsOverview(periodo = '30dias') {
+  async getVisitorsOverview(periodo = '30dias', excluirRoles = null, soloRoles = null) {
     try {
-      const response = await apiClient.get('/analytics/visitas/overview', {
-        params: { periodo },
-      });
+      const params = { periodo };
+      if (excluirRoles && excluirRoles.length > 0) params.excluirRoles = excluirRoles.join(',');
+      if (soloRoles && soloRoles.length > 0) params.soloRoles = soloRoles.join(',');
+      const response = await apiClient.get('/analytics/visitas/overview', { params });
       return response.data;
     } catch (error) {
       console.error('Error obteniendo overview de visitas:', error);
@@ -84,11 +85,12 @@ class AnalyticsService {
     }
   }
 
-  async getPageViewsStats(periodo = '30dias') {
+  async getPageViewsStats(periodo = '30dias', excluirRoles = null, soloRoles = null) {
     try {
-      const response = await apiClient.get('/analytics/visitas/paginas', {
-        params: { periodo },
-      });
+      const params = { periodo };
+      if (excluirRoles && excluirRoles.length > 0) params.excluirRoles = excluirRoles.join(',');
+      if (soloRoles && soloRoles.length > 0) params.soloRoles = soloRoles.join(',');
+      const response = await apiClient.get('/analytics/visitas/paginas', { params });
       return response.data;
     } catch (error) {
       console.error('Error obteniendo stats de páginas:', error);
@@ -96,11 +98,12 @@ class AnalyticsService {
     }
   }
 
-  async getProductViewsStats(periodo = '30dias', limite = 20) {
+  async getProductViewsStats(periodo = '30dias', limite = 20, excluirRoles = null, soloRoles = null) {
     try {
-      const response = await apiClient.get('/analytics/visitas/productos', {
-        params: { periodo, limite },
-      });
+      const params = { periodo, limite };
+      if (excluirRoles && excluirRoles.length > 0) params.excluirRoles = excluirRoles.join(',');
+      if (soloRoles && soloRoles.length > 0) params.soloRoles = soloRoles.join(',');
+      const response = await apiClient.get('/analytics/visitas/productos', { params });
       return response.data;
     } catch (error) {
       console.error('Error obteniendo stats de productos:', error);
@@ -108,11 +111,12 @@ class AnalyticsService {
     }
   }
 
-  async getBrandViewsStats(periodo = '30dias', limite = 20) {
+  async getBrandViewsStats(periodo = '30dias', limite = 20, excluirRoles = null, soloRoles = null) {
     try {
-      const response = await apiClient.get('/analytics/visitas/marcas', {
-        params: { periodo, limite },
-      });
+      const params = { periodo, limite };
+      if (excluirRoles && excluirRoles.length > 0) params.excluirRoles = excluirRoles.join(',');
+      if (soloRoles && soloRoles.length > 0) params.soloRoles = soloRoles.join(',');
+      const response = await apiClient.get('/analytics/visitas/marcas', { params });
       return response.data;
     } catch (error) {
       console.error('Error obteniendo stats de marcas:', error);

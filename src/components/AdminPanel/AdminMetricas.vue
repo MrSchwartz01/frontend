@@ -2,15 +2,71 @@
   <div class="admin-metricas">
     <div class="metricas-header">
       <h2>📊 Métricas de Visitas</h2>
-      <div class="periodo-selector">
-        <label>Período:</label>
-        <select v-model="periodoSeleccionado" @change="loadAllMetrics">
-          <option value="7dias">Últimos 7 días</option>
-          <option value="30dias">Últimos 30 días</option>
-          <option value="3meses">Últimos 3 meses</option>
-          <option value="año">Último año</option>
-        </select>
+      <div class="controles">
+        <div class="periodo-selector">
+          <label>Período:</label>
+          <select v-model="periodoSeleccionado" @change="loadAllMetrics">
+            <option value="7dias">Últimos 7 días</option>
+            <option value="30dias">Últimos 30 días</option>
+            <option value="3meses">Últimos 3 meses</option>
+            <option value="año">Último año</option>
+          </select>
+        </div>
+
+        <!-- Modo de vista -->
+        <div class="modo-vista">
+          <button
+            :class="['btn-modo', { active: modoVista === 'clientes' }]"
+            @click="setModo('clientes')"
+            title="Solo visitas de clientes (excluye staff)"
+          >
+            👤 Clientes
+          </button>
+          <button
+            :class="['btn-modo', { active: modoVista === 'staff' }]"
+            @click="setModo('staff')"
+            title="Solo visitas de personal interno"
+          >
+            👔 Staff
+          </button>
+          <button
+            :class="['btn-modo', { active: modoVista === 'todos' }]"
+            @click="setModo('todos')"
+            title="Todas las visitas sin filtrar"
+          >
+            🌐 Todos
+          </button>
+        </div>
       </div>
+    </div>
+
+    <!-- Filtros de roles para modo "todos" o personalizado -->
+    <div v-if="modoVista === 'todos'" class="filtros-roles">
+      <span class="filtros-label">Filtrar roles:</span>
+      <label v-for="rol in rolesDisponibles" :key="rol.value" class="rol-checkbox">
+        <input
+          type="checkbox"
+          :value="rol.value"
+          v-model="rolesExcluidos"
+          @change="loadAllMetrics"
+        />
+        <span>{{ rol.emoji }} {{ rol.label }}</span>
+      </label>
+      <small class="filtros-hint">Marcados = excluidos del conteo</small>
+    </div>
+
+    <!-- Badge de modo activo -->
+    <div class="modo-badge" :class="'modo-' + modoVista">
+      <span v-if="modoVista === 'clientes'">
+        👤 Mostrando visitas de clientes (administradores, vendedores y técnicos excluidos)
+      </span>
+      <span v-else-if="modoVista === 'staff'">
+        👔 Mostrando visitas de personal interno únicamente (admin, vendedor, técnico)
+      </span>
+      <span v-else>
+        🌐 Mostrando todas las visitas
+        <span v-if="rolesExcluidos.length > 0"> · Excluidos: {{ rolesExcluidos.join(', ') }}</span>
+      </span>
     </div>
 
     <!-- Loading State -->
@@ -74,8 +130,8 @@
       <div class="chart-section" v-if="pageViewsStats.viewsByDate">
         <h3>📈 Visitas por Día</h3>
         <div class="simple-chart">
-          <div 
-            v-for="(visita, index) in pageViewsStats.viewsByDate.visitas" 
+          <div
+            v-for="(visita, index) in pageViewsStats.viewsByDate.visitas"
             :key="index"
             class="chart-bar"
             :style="{ height: getBarHeight(visita, Math.max(...pageViewsStats.viewsByDate.visitas)) + '%' }"
@@ -85,8 +141,8 @@
           </div>
         </div>
         <div class="chart-labels">
-          <span 
-            v-for="(label, index) in pageViewsStats.viewsByDate.labels" 
+          <span
+            v-for="(label, index) in pageViewsStats.viewsByDate.labels"
             :key="index"
             class="chart-label"
           >
@@ -114,8 +170,8 @@
               <td><strong>{{ page.visitas.toLocaleString() }}</strong></td>
               <td>
                 <div class="progress-bar">
-                  <div 
-                    class="progress-fill" 
+                  <div
+                    class="progress-fill"
                     :style="{ width: getPercentage(page.visitas, pageViewsStats.totalViews) + '%' }"
                   ></div>
                   <span class="progress-text">{{ getPercentage(page.visitas, pageViewsStats.totalViews).toFixed(1) }}%</span>
@@ -147,8 +203,8 @@
               <td><strong>{{ producto.visitas.toLocaleString() }}</strong></td>
               <td>
                 <div class="progress-bar">
-                  <div 
-                    class="progress-fill product" 
+                  <div
+                    class="progress-fill product"
                     :style="{ width: getPercentage(producto.visitas, productViewsStats.totalViews) + '%' }"
                   ></div>
                   <span class="progress-text">{{ getPercentage(producto.visitas, productViewsStats.totalViews).toFixed(1) }}%</span>
@@ -178,8 +234,8 @@
               <td><strong>{{ marca.visitas.toLocaleString() }}</strong></td>
               <td>
                 <div class="progress-bar">
-                  <div 
-                    class="progress-fill brand" 
+                  <div
+                    class="progress-fill brand"
                     :style="{ width: getPercentage(marca.visitas, brandViewsStats.totalViews) + '%' }"
                   ></div>
                   <span class="progress-text">{{ getPercentage(marca.visitas, brandViewsStats.totalViews).toFixed(1) }}%</span>
@@ -201,11 +257,21 @@
 <script>
 import analyticsService from '@/services/analytics';
 
+const STAFF_ROLES = ['administrador', 'vendedor', 'tecnico'];
+
 export default {
   name: 'AdminMetricas',
   data() {
     return {
       periodoSeleccionado: '30dias',
+      // 'clientes' = excluir staff | 'staff' = solo staff | 'todos' = sin filtro
+      modoVista: 'clientes',
+      rolesExcluidos: [],
+      rolesDisponibles: [
+        { value: 'administrador', label: 'Administrador', emoji: '🔴' },
+        { value: 'vendedor',      label: 'Vendedor',      emoji: '🔵' },
+        { value: 'tecnico',       label: 'Técnico',       emoji: '🟢' },
+      ],
       loading: false,
       error: null,
       overview: {},
@@ -222,22 +288,40 @@ export default {
         this.brandViewsStats.topBrands?.length > 0
       );
     },
+    /** Roles a excluir calculados según el modo activo */
+    excluirRolesAplicados() {
+      if (this.modoVista === 'clientes') return STAFF_ROLES;
+      if (this.modoVista === 'todos') return this.rolesExcluidos;
+      return null; // staff usa soloRoles
+    },
+    /** Roles a incluir sólo (modo staff) */
+    soloRolesAplicados() {
+      if (this.modoVista === 'staff') return STAFF_ROLES;
+      return null;
+    },
   },
   mounted() {
     this.loadAllMetrics();
   },
   methods: {
+    setModo(modo) {
+      this.modoVista = modo;
+      this.loadAllMetrics();
+    },
+
     async loadAllMetrics() {
       this.loading = true;
       this.error = null;
 
+      const excluir = this.excluirRolesAplicados;
+      const solo = this.soloRolesAplicados;
+
       try {
-        // Cargar todas las métricas en paralelo
         const [overview, pageViews, productViews, brandViews] = await Promise.all([
-          analyticsService.getVisitorsOverview(this.periodoSeleccionado),
-          analyticsService.getPageViewsStats(this.periodoSeleccionado),
-          analyticsService.getProductViewsStats(this.periodoSeleccionado, 20),
-          analyticsService.getBrandViewsStats(this.periodoSeleccionado, 20),
+          analyticsService.getVisitorsOverview(this.periodoSeleccionado, excluir, solo),
+          analyticsService.getPageViewsStats(this.periodoSeleccionado, excluir, solo),
+          analyticsService.getProductViewsStats(this.periodoSeleccionado, 20, excluir, solo),
+          analyticsService.getBrandViewsStats(this.periodoSeleccionado, 20, excluir, solo),
         ]);
 
         this.overview = overview;
@@ -273,10 +357,10 @@ export default {
 .metricas-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+  align-items: flex-start;
+  margin-bottom: 16px;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
 }
 
 .metricas-header h2 {
@@ -284,24 +368,133 @@ export default {
   color: #2c3e50;
 }
 
+.controles {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .periodo-selector {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .periodo-selector label {
   font-weight: 600;
   color: #555;
+  font-size: 13px;
 }
 
 .periodo-selector select {
-  padding: 8px 15px;
+  padding: 6px 12px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   background-color: white;
+}
+
+/* Botones de modo de vista */
+.modo-vista {
+  display: flex;
+  gap: 4px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.btn-modo {
+  padding: 5px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-modo:hover {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-modo.active {
+  background: #0066cc;
+  color: white;
+  box-shadow: 0 2px 6px rgba(0, 102, 204, 0.35);
+}
+
+/* Filtros de roles (modo "todos") */
+.filtros-roles {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.filtros-label {
+  font-weight: 600;
+  color: #795548;
+}
+
+.rol-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  color: #555;
+  user-select: none;
+}
+
+.rol-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  width: 14px;
+  height: 14px;
+}
+
+.filtros-hint {
+  color: #9e9e9e;
+  font-style: italic;
+  font-size: 11px;
+  margin-left: auto;
+}
+
+/* Badge de modo activo */
+.modo-badge {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.modo-badge.modo-clientes {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.modo-badge.modo-staff {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.modo-badge.modo-todos {
+  background: #f3e5f5;
+  color: #6a1b9a;
+  border: 1px solid #e1bee7;
 }
 
 /* Loading State */
