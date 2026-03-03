@@ -24,6 +24,7 @@ export default {
       promociones: [],
       searchQuery: "",
       isAuthenticated: false,
+      userRole: null,
       limiteProductos: 10,
       selectedPriceRange: "", // '', 'low', 'mid', 'high'
       
@@ -51,6 +52,7 @@ export default {
   },
   async created() {
     this.isAuthenticated = !!localStorage.getItem("access_token");
+    this.userRole = authService.getUserRole();
 
     try {
       // Cargar Banners desde la API

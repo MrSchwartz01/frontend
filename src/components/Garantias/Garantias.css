@@ -1,7 +1,23 @@
 /* Garantias.css - Estilos específicos del componente */
 /* Los estilos principales vienen de globals.css */
 
-/* Ajustes específicos si son necesarios */
+/* Las tarjetas se fusionan con el fondo: sin cuadro visible */
+.section-card {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.section-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.section-card.card-accent {
+  border-left: 4px solid #FF6000;
+  padding-left: 20px;
+}
+
 .section-card strong {
   color: #FF6000;
 }

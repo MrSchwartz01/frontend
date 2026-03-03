@@ -29,8 +29,8 @@
                 title="Video destacado"
               ></iframe>
             </div>
-            <!-- Controles de playlist (solo si hay más de 1 video) -->
-            <div v-if="videoPlaylist.length > 1" class="video-playlist-controls">
+            <!-- Controles de playlist (solo visible para admin/vendedor con más de 1 video) -->
+            <div v-if="videoPlaylist.length > 1 && (userRole === 'administrador' || userRole === 'vendedor')" class="video-playlist-controls">
               <button class="vp-btn" @click="prevVideo" title="Video anterior">&#8249;</button>
               <div class="vp-info">
                 <span class="vp-titulo">{{ currentVideo?.titulo }}</span>
