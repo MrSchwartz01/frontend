@@ -194,6 +194,12 @@ export default {
     agregarAlCarrito() {
       if (!this.producto) return;
 
+      // Verificar si el usuario está autenticado
+      if (!localStorage.getItem('access_token')) {
+        this.$router.push('/login');
+        return;
+      }
+
       // Obtener carrito del localStorage
       let carrito = [];
       const carritoGuardado = localStorage.getItem('carrito');

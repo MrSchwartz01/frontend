@@ -293,6 +293,12 @@ export default {
     },
     
     agregarAlCarrito(producto) {
+      // Verificar si el usuario está autenticado
+      if (!localStorage.getItem('access_token')) {
+        this.$router.push('/login');
+        return;
+      }
+
       const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
       const existente = carrito.find(item => item.codigo === producto.codigo);
       
