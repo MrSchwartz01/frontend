@@ -99,7 +99,7 @@
             <button
               class="btn btn-save"
               @click="guardarPlaylist"
-              :disabled="saving || playlist.length === 0"
+              :disabled="saving"
             >
               <FontAwesomeIcon :icon="['fas', 'gear']" />
               {{ saving ? 'Guardando...' : 'Guardar Orden' }}
@@ -112,7 +112,8 @@
 
           <div v-else-if="playlist.length === 0" class="playlist-empty">
             <FontAwesomeIcon :icon="['fas', 'video']" class="empty-icon" />
-            <p>No hay videos en la lista. Agrega el primero.</p>
+            <p>No hay videos en la lista.</p>
+            <p class="empty-hint">Se mostrará el video predeterminado en la página principal. Agrega videos para personalizarla.</p>
           </div>
 
           <transition-group v-else name="list" tag="ul" class="playlist-list">

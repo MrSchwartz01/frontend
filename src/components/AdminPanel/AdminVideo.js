@@ -174,8 +174,10 @@ export default {
     // ===== GUARDAR =====
     async guardarPlaylist() {
       if (this.playlist.length === 0) {
-        this.showMessage('La lista está vacía', 'error');
-        return;
+        const confirmar = confirm(
+          '¿Seguro que deseas vaciar la lista de videos? Se mostrará el video predeterminado en la página principal.'
+        );
+        if (!confirmar) return;
       }
       this.saving = true;
       try {
@@ -188,7 +190,12 @@ export default {
             },
           }
         );
-        this.showMessage('¡Playlist guardada exitosamente!', 'success');
+        this.showMessage(
+          this.playlist.length === 0
+            ? 'Playlist vaciada. Se mostrará el video predeterminado.'
+            : '¡Playlist guardada exitosamente!',
+          'success'
+        );
       } catch (err) {
         console.error('Error al guardar playlist:', err);
         this.showMessage('Error al guardar la playlist', 'error');

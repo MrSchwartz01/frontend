@@ -67,6 +67,9 @@ export default {
         ];
       }
 
+      // URL de video predeterminado (placeholder cuando no hay playlist configurada)
+      const VIDEO_PLACEHOLDER = 'https://www.youtube.com/embed/r-DF3-FS_6k?autoplay=1&mute=1&loop=1&playlist=r-DF3-FS_6k';
+
       // Cargar Playlist de Videos desde la API
       try {
         const playlistResponse = await apiClient.get('/configuracion/video-playlist');
@@ -76,13 +79,13 @@ export default {
           this.videoDestacado = this.buildEmbedUrl(playlist[0].url);
           this.startVideoTimer();
         } else {
-          // Fallback al endpoint antiguo
-          const videoResponse = await apiClient.get('/configuracion/video-destacado/url');
-          this.videoDestacado = videoResponse.data.valor || '';
+          // Sin videos configurados → mostrar placeholder
+          this.videoDestacado = VIDEO_PLACEHOLDER;
         }
       } catch (videoError) {
         console.error('Error al cargar playlist:', videoError);
-        this.videoDestacado = 'https://www.youtube.com/embed/r-DF3-FS_6k?autoplay=1&mute=1&loop=1&playlist=r-DF3-FS_6k';
+        // Error de red → mostrar placeholder
+        this.videoDestacado = VIDEO_PLACEHOLDER;
       }
 
       // Cargar Productos
