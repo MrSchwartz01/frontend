@@ -334,7 +334,12 @@
             <!-- Vista previa del logo actual -->
             <div class="logo-preview" v-if="currentLogo">
               <h3>Logo Actual:</h3>
-              <img :src="currentLogo" alt="Logo actual" class="current-logo" />
+              <img
+                :src="currentLogo"
+                alt="Logo actual"
+                class="current-logo"
+                @error="currentLogo = ''"
+              />
             </div>
 
             <!-- Selector de modo -->

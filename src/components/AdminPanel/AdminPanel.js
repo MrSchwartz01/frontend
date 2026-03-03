@@ -417,10 +417,20 @@ export default {
     },
 
     // ========== LOGO ==========
+    resolveLogoUrl(url) {
+      if (!url) return '';
+      // Si ya es una URL absoluta, usarla directamente
+      if (/^https?:\/\//.test(url)) return url;
+      // Si es una ruta relativa (/uploads/...), construir la URL del servidor
+      const serverRoot = API_BASE_URL.replace(/\/api$/, '');
+      return serverRoot + url;
+    },
+
     async loadLogo() {
       try {
         const response = await apiClient.get('/configuracion/logo_url');
-        this.currentLogo = response.data.valor || response.data;
+        const raw = response.data.valor || response.data;
+        this.currentLogo = this.resolveLogoUrl(raw);
       } catch (error) {
         console.log('No hay logo configurado');
       }
@@ -447,7 +457,7 @@ export default {
           );
         }
         this.showLogoMessage('Logo actualizado exitosamente', 'success');
-        this.loadLogo();
+        await this.loadLogo();
         this.logoForm.logo_url = '';
         this.logoFile = null;
         this.logoFilePreview = '';
