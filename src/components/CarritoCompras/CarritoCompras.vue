@@ -19,7 +19,9 @@
       <div class="carrito-container">
         <!-- Carrito vacío -->
         <div v-if="productosCarrito.length === 0" class="carrito-vacio">
-          <div class="vacio-icon">🛒</div>
+          <div class="vacio-icon">
+            <FontAwesomeIcon :icon="['fas', 'cart-arrow-down']" />
+          </div>
           <h2>Tu carrito está vacío</h2>
           <p>Agrega productos para comenzar tu compra</p>
           <button @click="irAInicio" class="btn-explorar">

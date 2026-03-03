@@ -181,7 +181,7 @@ export default {
       
       if (role !== 'administrador' && role !== 'vendedor') {
         this.$router.push('/');
-        alert('Acceso denegado: Solo administradores y vendedores');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Acceso denegado: Solo administradores y vendedores', tipo: 'error' });
         return false;
       }
       

@@ -74,7 +74,7 @@ export default {
         this.$toast?.success('Orden asignada exitosamente');
       } catch (err) {
         console.error('Error al asignar orden:', err);
-        alert(err.response?.data?.message || 'Error al asignar la orden');
+        this.$store.dispatch('mostrarToast', { mensaje: err.response?.data?.message || 'Error al asignar la orden', tipo: 'error' });
       }
     },
     async desasignarOrden(ordenId) {
@@ -87,7 +87,7 @@ export default {
         this.$toast?.success('Orden liberada exitosamente');
       } catch (err) {
         console.error('Error al desasignar orden:', err);
-        alert(err.response?.data?.message || 'Error al liberar la orden');
+        this.$store.dispatch('mostrarToast', { mensaje: err.response?.data?.message || 'Error al liberar la orden', tipo: 'error' });
       }
     },
     async cambiarEstado(ordenId, nuevoEstado) {
@@ -102,7 +102,7 @@ export default {
         this.$toast?.success('Estado actualizado exitosamente');
       } catch (err) {
         console.error('Error al cambiar estado:', err);
-        alert(err.response?.data?.message || 'Error al cambiar el estado');
+        this.$store.dispatch('mostrarToast', { mensaje: err.response?.data?.message || 'Error al cambiar el estado', tipo: 'error' });
       }
     },
     obtenerTextoEstado(estado) {

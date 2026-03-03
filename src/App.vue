@@ -2,18 +2,21 @@
   <div id="app" :class="{ 'dark-mode': isDarkMode }">
     <router-view /> <!-- Muestra el componente basado en la ruta actual -->
     <WhatsAppWidget /> <!-- Widget flotante de WhatsApp -->
+    <ToastNotification /> <!-- Notificaciones contextuales globales -->
   </div>
 </template>
 
 <script>
 import WhatsAppWidget from './components/WhatsAppWidget/WhatsAppWidget.vue';
+import ToastNotification from './components/ToastNotification/ToastNotification.vue';
 import inactivityService from './services/inactivityService';
 import apiClient from './services/api';
 
 export default {
   name: 'App',
   components: {
-    WhatsAppWidget
+    WhatsAppWidget,
+    ToastNotification,
   },
   data() {
     return {

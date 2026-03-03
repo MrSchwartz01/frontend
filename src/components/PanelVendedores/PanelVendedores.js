@@ -67,7 +67,7 @@ export default {
         this.$toast?.success('Pedido asignado exitosamente');
       } catch (err) {
         console.error('Error al asignar pedido:', err);
-        alert(err.response?.data?.message || 'Error al asignar el pedido');
+        this.$store.dispatch('mostrarToast', { mensaje: err.response?.data?.message || 'Error al asignar el pedido', tipo: 'error' });
       }
     },
     async desasignarPedido(pedidoId) {
@@ -86,7 +86,7 @@ export default {
         this.$toast?.success('Pedido liberado exitosamente');
       } catch (err) {
         console.error('Error al desasignar pedido:', err);
-        alert(err.response?.data?.message || 'Error al liberar el pedido');
+        this.$store.dispatch('mostrarToast', { mensaje: err.response?.data?.message || 'Error al liberar el pedido', tipo: 'error' });
       }
     },
     async cambiarEstado(pedidoId, nuevoEstado) {
@@ -105,7 +105,7 @@ export default {
         this.$toast?.success('Estado actualizado exitosamente');
       } catch (err) {
         console.error('Error al cambiar estado:', err);
-        alert(err.response?.data?.message || 'Error al cambiar el estado');
+        this.$store.dispatch('mostrarToast', { mensaje: err.response?.data?.message || 'Error al cambiar el estado', tipo: 'error' });
       }
     },
     obtenerTextoEstado(estado) {

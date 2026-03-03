@@ -354,9 +354,8 @@ export default {
       if (productoExistente) {
         // Aumentar cantidad
         productoExistente.cantidad++;
-        alert('Cantidad actualizada en el carrito');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Cantidad actualizada en el carrito', tipo: 'success' });
       } else {
-        // Agregar nuevo producto
         carrito.push({
           codigo: producto.codigo,
           producto: producto.producto,
@@ -366,7 +365,7 @@ export default {
           imagen_url: producto.imagen_url,
           medida: producto.medida
         });
-        alert('Producto agregado al carrito');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Producto agregado al carrito', tipo: 'success' });
       }
 
       // Guardar en localStorage

@@ -296,7 +296,7 @@ export default {
     
     verDetallePedido(pedidoId) {
       // Aquí puedes implementar la lógica para ver el detalle del pedido
-      alert(`Ver detalle del pedido #${pedidoId}`);
+      this.$store.dispatch('mostrarToast', { mensaje: `Ver detalle del pedido #${pedidoId}`, tipo: 'info' });
     },
     
     buscarProductos(query) {

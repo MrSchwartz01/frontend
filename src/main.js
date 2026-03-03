@@ -30,7 +30,13 @@ import {
   faGear,
   faPerson,
   faBoltLightning,
-  faChartBar
+  faChartBar,
+  faCartArrowDown,
+  faCircleCheck,
+  faCircleXmark,
+  faTriangleExclamation,
+  faCircleInfo,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 
 // Agregar iconos a la librería
@@ -38,7 +44,9 @@ library.add(
   farBell, farEye,
   faPencil, faArrowsRotate, fasBell, faTrash, faKey, faBan, faEye,
   faBox, faTag, faShield, faImage, faPalette, faLock, faVideo,
-  faGear, faPerson, faBoltLightning, faChartBar
+  faGear, faPerson, faBoltLightning, faChartBar,
+  faCartArrowDown, faCircleCheck, faCircleXmark,
+  faTriangleExclamation, faCircleInfo, faXmark,
 );
 
 // Importar configuración de Axios con interceptor

@@ -153,7 +153,7 @@ export default {
         console.error('Error al cargar productos:', error);
         // Solo mostrar mensaje si no es error 401 (el interceptor ya lo maneja)
         if (error.response?.status !== 401) {
-          alert('Error al cargar productos: ' + (error.response?.data?.message || error.message));
+          this.$store.dispatch('mostrarToast', { mensaje: 'Error al cargar productos: ' + (error.response?.data?.message || error.message), tipo: 'error' });
         }
       } finally {
         this.cargando = false;
@@ -260,7 +260,7 @@ export default {
         this.irAPagina(this.paginaInput);
         this.paginaInput = null; // Limpiar el input después de navegar
       } else if (this.paginaInput) {
-        alert(`Por favor ingresa un número entre 1 y ${this.totalPaginas}`);
+        this.$store.dispatch('mostrarToast', { mensaje: `Por favor ingresa un número entre 1 y ${this.totalPaginas}`, tipo: 'warning' });
       }
     },
 
@@ -305,20 +305,20 @@ export default {
             datosProducto,
             { headers }
           );
-          alert('Producto actualizado correctamente');
+          this.$store.dispatch('mostrarToast', { mensaje: 'Producto actualizado correctamente', tipo: 'success' });
         } else {
           // Crear nuevo producto
           await apiClient.post('/tienda/productos', this.formProducto, {
             headers,
           });
-          alert('Producto creado correctamente');
+          this.$store.dispatch('mostrarToast', { mensaje: 'Producto creado correctamente', tipo: 'success' });
         }
 
         await this.cargarProductos();
         this.cerrarEditModal();
       } catch (error) {
         console.error('Error al guardar producto:', error);
-        alert('Error al guardar producto: ' + (error.response?.data?.message || error.message));
+        this.$store.dispatch('mostrarToast', { mensaje: 'Error al guardar producto: ' + (error.response?.data?.message || error.message), tipo: 'error' });
       } finally {
         this.guardando = false;
       }
@@ -336,10 +336,10 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         await this.cargarProductos();
-        alert(`Producto ${accion === 'desactivar' ? 'desactivado' : 'activado'} correctamente`);
+        this.$store.dispatch('mostrarToast', { mensaje: `Producto ${accion === 'desactivar' ? 'desactivado' : 'activado'} correctamente`, tipo: 'success' });
       } catch (error) {
         console.error('Error al cambiar estado:', error);
-        alert('Error al cambiar estado del producto');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Error al cambiar estado del producto', tipo: 'error' });
       }
     },
 
@@ -372,14 +372,14 @@ export default {
         // Validar tipo
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-          alert('Solo se permiten archivos JPG, PNG o WEBP');
+          this.$store.dispatch('mostrarToast', { mensaje: 'Solo se permiten archivos JPG, PNG o WEBP', tipo: 'warning' });
           return;
         }
 
         // Validar tamaño (5MB)
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-          alert('El archivo no debe superar 5MB');
+          this.$store.dispatch('mostrarToast', { mensaje: 'El archivo no debe superar 5MB', tipo: 'warning' });
           return;
         }
 
@@ -412,7 +412,7 @@ export default {
         
         console.log('✅ Respuesta:', response.data);
 
-        alert('Imagen subida correctamente');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Imagen subida correctamente', tipo: 'success' });
         this.archivoSeleccionado = null;
         this.imagenPrincipal = false;
         this.$refs.fileInput.value = '';
@@ -420,7 +420,7 @@ export default {
       } catch (error) {
         console.error('Error al subir imagen:', error);
         console.error('Respuesta del servidor:', error.response?.data);
-        alert('Error al subir imagen: ' + (error.response?.data?.message || error.response?.data?.detail || error.message));
+        this.$store.dispatch('mostrarToast', { mensaje: 'Error al subir imagen: ' + (error.response?.data?.message || error.response?.data?.detail || error.message), tipo: 'error' });
       } finally {
         this.subiendoImagen = false;
       }
@@ -435,10 +435,10 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         await this.cargarImagenes(this.productoActual.codigo);
-        alert('Imagen marcada como principal');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Imagen marcada como principal', tipo: 'success' });
       } catch (error) {
         console.error('Error al marcar imagen principal:', error);
-        alert('Error al marcar imagen como principal');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Error al marcar imagen como principal', tipo: 'error' });
       }
     },
 
@@ -449,11 +449,11 @@ export default {
         // imagenId es el ID directo que se pasa desde el template
         await apiClient.delete(`/images/${imagenId}`);
         await this.cargarImagenes(this.productoActual.codigo);
-        alert('Imagen eliminada correctamente');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Imagen eliminada correctamente', tipo: 'success' });
       } catch (error) {
         console.error('Error al eliminar imagen:', error);
         const errorMsg = error.response?.data?.message || 'Error desconocido';
-        alert(`Error al eliminar imagen: ${errorMsg}`);
+        this.$store.dispatch('mostrarToast', { mensaje: `Error al eliminar imagen: ${errorMsg}`, tipo: 'error' });
       }
     },
 

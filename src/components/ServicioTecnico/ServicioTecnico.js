@@ -64,19 +64,19 @@ export default {
     submitSurvey() {
       // Validación básica
       if (this.survey.quality === 0) {
-        alert("Por favor, califica la calidad del servicio");
+        this.$store.dispatch('mostrarToast', { mensaje: 'Por favor, califica la calidad del servicio', tipo: 'warning' });
         return;
       }
       if (!this.survey.response) {
-        alert("Por favor, responde sobre el tiempo de respuesta");
+        this.$store.dispatch('mostrarToast', { mensaje: 'Por favor, responde sobre el tiempo de respuesta', tipo: 'warning' });
         return;
       }
       if (!this.survey.price) {
-        alert("Por favor, responde sobre el precio");
+        this.$store.dispatch('mostrarToast', { mensaje: 'Por favor, responde sobre el precio', tipo: 'warning' });
         return;
       }
       if (!this.survey.recommend) {
-        alert("Por favor, responde si recomendarías nuestros servicios");
+        this.$store.dispatch('mostrarToast', { mensaje: 'Por favor, responde si recomendarías nuestros servicios', tipo: 'warning' });
         return;
       }
 

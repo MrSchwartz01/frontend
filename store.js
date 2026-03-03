@@ -28,12 +28,21 @@ import { createStore } from 'vuex';
     }
   }
 
+  let _toastIdCounter = 0;
+
   const store = createStore({
     state: {
       carrito: [],
       historialProductosVistos: cargarHistorialInicial(),
+      toasts: [],
     },
     mutations: {
+      agregarToast(state, toast) {
+        state.toasts.push(toast);
+      },
+      eliminarToast(state, id) {
+        state.toasts = state.toasts.filter((t) => t.id !== id);
+      },
       agregarAlCarrito(state, producto) {
         state.carrito.push(producto);
       },
@@ -86,6 +95,14 @@ import { createStore } from 'vuex';
       },
     },
     actions: {
+      mostrarToast({ commit }, { mensaje, tipo = 'info', duracion = 4000 }) {
+        const id = ++_toastIdCounter;
+        commit('agregarToast', { id, mensaje, tipo });
+        setTimeout(() => commit('eliminarToast', id), duracion);
+      },
+      cerrarToast({ commit }, id) {
+        commit('eliminarToast', id);
+      },
       agregarAlCarrito({ commit }, producto) {
         commit('agregarAlCarrito', producto);
       },
@@ -108,6 +125,7 @@ import { createStore } from 'vuex';
     getters: {
       carrito: (state) => state.carrito,
       historialProductosVistos: (state) => state.historialProductosVistos,
+      toasts: (state) => state.toasts,
     },
   });
 

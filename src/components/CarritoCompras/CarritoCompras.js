@@ -125,7 +125,7 @@ export default {
     },
     procederCompra() {
       if (!this.isAuthenticated) {
-        alert("Debes iniciar sesión para continuar con la compra");
+        this.$store.dispatch('mostrarToast', { mensaje: 'Debes iniciar sesión para continuar con la compra', tipo: 'warning' });
         this.$router.push("/login");
       } else {
         this.mostrarCheckout = true;
@@ -135,7 +135,7 @@ export default {
     async finalizarCompra() {
       // Validar datos
       if (!this.datosEnvio.nombre_cliente || !this.datosEnvio.email_cliente || !this.datosEnvio.direccion_envio) {
-        alert('Por favor completa todos los campos requeridos');
+        this.$store.dispatch('mostrarToast', { mensaje: 'Por favor completa todos los campos requeridos', tipo: 'warning' });
         return;
       }
 
@@ -170,23 +170,11 @@ export default {
         );
 
         // Éxito
-        const mensajeExito = `
-¡Pedido enviado exitosamente!
-
-📦 Código de Pedido: ${response.data.codigo}
-💰 Total: $${response.data.total.toFixed(2)}
-
-👤 Un vendedor se pondrá en contacto contigo pronto para:
-   • Coordinar el método de pago
-   • Confirmar la dirección de entrega
-   • Responder tus preguntas
-
-📧 Recibirás un email de confirmación en breve.
-
-¡Gracias por tu preferencia!
-        `;
-        
-        alert(mensajeExito);
+        this.$store.dispatch('mostrarToast', {
+          mensaje: `¡Pedido #${response.data.codigo} enviado exitosamente!\nTotal: $${response.data.total.toFixed(2)}\nUn vendedor se pondrá en contacto contigo pronto.`,
+          tipo: 'success',
+          duracion: 6000,
+        });
         
         // Limpiar carrito
         this.productosCarrito = [];
@@ -198,7 +186,7 @@ export default {
 
       } catch (error) {
         console.error('Error al crear orden:', error);
-        alert('Error al procesar la orden: ' + (error.response?.data?.message || error.message));
+        this.$store.dispatch('mostrarToast', { mensaje: 'Error al procesar la orden: ' + (error.response?.data?.message || error.message), tipo: 'error' });
       } finally {
         this.procesandoPago = false;
       }

@@ -284,7 +284,7 @@ export default {
         this.cambiarPagina(this.paginaInput);
         this.paginaInput = null; // Limpiar el input después de navegar
       } else if (this.paginaInput) {
-        alert(`Por favor ingresa un número entre 1 y ${this.totalPaginas}`);
+        this.$store.dispatch('mostrarToast', { mensaje: `Por favor ingresa un número entre 1 y ${this.totalPaginas}`, tipo: 'warning' });
       }
     },
     
@@ -318,7 +318,7 @@ export default {
       }
       
       localStorage.setItem('carrito', JSON.stringify(carrito));
-      alert('Producto agregado al carrito');
+      this.$store.dispatch('mostrarToast', { mensaje: 'Producto agregado al carrito', tipo: 'success' });
     },
     
     buscarProductos(query) {
