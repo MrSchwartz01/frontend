@@ -74,6 +74,7 @@ export default {
 
       // Logo
       currentLogo: '',
+      logoLoadError: false,
       logoInputMode: 'url', // 'url' | 'archivo'
       logoFile: null,
       logoFilePreview: '',
@@ -418,18 +419,24 @@ export default {
 
     // ========== LOGO ==========
     resolveLogoUrl(url) {
-      if (!url) return '';
+      if (!url || typeof url !== 'string') return '';
       // Si ya es una URL absoluta, usarla directamente
       if (/^https?:\/\//.test(url)) return url;
-      // Si es una ruta relativa (/uploads/...), construir la URL del servidor
-      const serverRoot = API_BASE_URL.replace(/\/api$/, '');
+      // Si es una ruta relativa (/uploads/...), construir la URL completa del backend.
+      // En modo proxy (API_BASE_URL = '/api'), serverRoot sería ''. En ese caso se
+      // intenta usar VUE_APP_API_URL para obtener la URL real del backend.
+      let serverRoot = API_BASE_URL.replace(/\/api$/, '');
+      if (!serverRoot) {
+        serverRoot = (process.env.VUE_APP_API_URL || '').replace(/\/api$/, '');
+      }
       return serverRoot + url;
     },
 
     async loadLogo() {
       try {
-        const response = await apiClient.get('/configuracion/logo_url');
-        const raw = response.data.valor || response.data;
+        // Usar el endpoint dedicado en lugar del genérico :clave
+        const response = await apiClient.get('/configuracion/logo/url');
+        const raw = typeof response.data?.valor === 'string' ? response.data.valor : '';
         this.currentLogo = this.resolveLogoUrl(raw);
       } catch (error) {
         console.log('No hay logo configurado');
@@ -457,6 +464,7 @@ export default {
           );
         }
         this.showLogoMessage('Logo actualizado exitosamente', 'success');
+        this.logoLoadError = false;
         await this.loadLogo();
         this.logoForm.logo_url = '';
         this.logoFile = null;

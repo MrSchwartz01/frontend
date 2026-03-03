@@ -332,14 +332,18 @@
         <div v-if="puedeEditarLogo()" class="form-section">
           <form @submit.prevent="submitLogo" class="logo-form">
             <!-- Vista previa del logo actual -->
-            <div class="logo-preview" v-if="currentLogo">
+            <div class="logo-preview" v-if="currentLogo || logoLoadError">
               <h3>Logo Actual:</h3>
               <img
+                v-if="currentLogo && !logoLoadError"
                 :src="currentLogo"
                 alt="Logo actual"
                 class="current-logo"
-                @error="currentLogo = ''"
+                @error="logoLoadError = true"
               />
+              <div v-if="logoLoadError" class="logo-load-error">
+                ⚠️ No se pudo cargar la imagen del logo. Verifica que la URL o el archivo sean accesibles.
+              </div>
             </div>
 
             <!-- Selector de modo -->
