@@ -74,6 +74,9 @@ export default {
 
       // Logo
       currentLogo: '',
+      logoInputMode: 'url', // 'url' | 'archivo'
+      logoFile: null,
+      logoFilePreview: '',
       logoForm: {
         logo_url: '',
       },
@@ -425,20 +428,42 @@ export default {
 
     async submitLogo() {
       try {
-        await apiClient.post('/configuracion',
-          {
-            clave: 'logo_url',
-            valor: this.logoForm.logo_url,
-          },
-          this.getAuthHeaders()
-        );
+        if (this.logoInputMode === 'archivo') {
+          if (!this.logoFile) {
+            this.showLogoMessage('Selecciona un archivo de imagen', 'error');
+            return;
+          }
+          const formData = new FormData();
+          formData.append('file', this.logoFile);
+          await apiClient.post('/configuracion/logo/upload', formData);
+        } else {
+          if (!this.logoForm.logo_url) {
+            this.showLogoMessage('Ingresa una URL válida', 'error');
+            return;
+          }
+          await apiClient.post('/configuracion',
+            { clave: 'logo_url', valor: this.logoForm.logo_url },
+            this.getAuthHeaders()
+          );
+        }
         this.showLogoMessage('Logo actualizado exitosamente', 'success');
         this.loadLogo();
         this.logoForm.logo_url = '';
+        this.logoFile = null;
+        this.logoFilePreview = '';
       } catch (error) {
         console.error('Error al actualizar logo:', error);
         this.showLogoMessage('Error al actualizar el logo', 'error');
       }
+    },
+
+    handleLogoFileChange(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      this.logoFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => { this.logoFilePreview = e.target.result; };
+      reader.readAsDataURL(file);
     },
 
     showLogoMessage(message, type) {

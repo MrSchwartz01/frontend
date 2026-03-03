@@ -331,14 +331,60 @@
         
         <div v-if="puedeEditarLogo()" class="form-section">
           <form @submit.prevent="submitLogo" class="logo-form">
+            <!-- Vista previa del logo actual -->
             <div class="logo-preview" v-if="currentLogo">
               <h3>Logo Actual:</h3>
               <img :src="currentLogo" alt="Logo actual" class="current-logo" />
             </div>
 
-            <div class="form-group">
-              <label>Nueva URL del Logo:</label>
-              <input type="text" v-model="logoForm.logo_url" required />
+            <!-- Selector de modo -->
+            <div class="logo-mode-selector">
+              <button
+                type="button"
+                :class="['mode-btn', { active: logoInputMode === 'url' }]"
+                @click="logoInputMode = 'url'; logoFile = null; logoFilePreview = ''"
+              >
+                🔗 Enlace URL
+              </button>
+              <button
+                type="button"
+                :class="['mode-btn', { active: logoInputMode === 'archivo' }]"
+                @click="logoInputMode = 'archivo'; logoForm.logo_url = ''"
+              >
+                📁 Subir Archivo
+              </button>
+            </div>
+
+            <!-- Modo URL -->
+            <div v-if="logoInputMode === 'url'" class="form-group">
+              <label>URL del Logo:</label>
+              <input
+                type="url"
+                v-model="logoForm.logo_url"
+                placeholder="https://ejemplo.com/logo.png"
+                :required="logoInputMode === 'url'"
+              />
+              <small class="form-hint">Ingresa el enlace directo a la imagen del logo.</small>
+              <div v-if="logoForm.logo_url" class="logo-url-preview">
+                <p>Vista previa:</p>
+                <img :src="logoForm.logo_url" alt="Vista previa URL" class="preview-img" @error="$event.target.style.display='none'" />
+              </div>
+            </div>
+
+            <!-- Modo Archivo -->
+            <div v-if="logoInputMode === 'archivo'" class="form-group">
+              <label>Seleccionar Archivo:</label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                @change="handleLogoFileChange"
+                :required="logoInputMode === 'archivo'"
+              />
+              <small class="form-hint">Formatos aceptados: JPG, PNG, WebP, GIF. Tamaño máximo: 5 MB.</small>
+              <div v-if="logoFilePreview" class="logo-url-preview">
+                <p>Vista previa:</p>
+                <img :src="logoFilePreview" alt="Vista previa del archivo" class="preview-img" />
+              </div>
             </div>
 
             <div class="form-actions">
