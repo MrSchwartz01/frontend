@@ -5,6 +5,7 @@ import AdminGarantias from './AdminGarantias.vue';
 import AdminPersonalizacion from './AdminPersonalizacion.vue';
 import AdminVideo from './AdminVideo.vue';
 import AdminMetricas from './AdminMetricas.vue';
+import AdminLogs from './AdminLogs.vue';
 import NotificationsPanel from '../NotificationsPanel/NotificationsPanel.vue';
 import NotificationsBell from '../NotificationsPanel/NotificationsBell.vue';
 
@@ -16,6 +17,7 @@ export default {
     AdminPersonalizacion,
     AdminVideo,
     AdminMetricas,
+    AdminLogs,
     NotificationsPanel,
     NotificationsBell,
   },
@@ -35,6 +37,7 @@ export default {
         { id: 'usuarios',       label: 'Usuarios',        icon: ['fas', 'person'] },
         { id: 'permisos',       label: 'Permisos',        icon: ['fas', 'lock'] },
         { id: 'notificaciones', label: 'Notificaciones',  icon: ['far', 'bell'] },
+        { id: 'actividad',      label: 'Actividad',        icon: ['fas', 'clock-rotate-left'] },
       ],
       isAuthenticated: !!localStorage.getItem('access_token'),
 
@@ -157,6 +160,41 @@ export default {
     goToHome() {
       this.$router.push('/home');
     },
+
+    // ========== AUDIT LOG ==========
+    async registrarLog(modulo, accion, descripcion, detalle = null, exitoso = true, error_detalle = null) {
+      try {
+        let username = 'desconocido';
+        let nombre   = '';
+        let rol      = localStorage.getItem('user_rol') || 'desconocido';
+
+        // El objeto `usuario` se guarda en localStorage al hacer login
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          try {
+            const u = JSON.parse(usuarioJson);
+            username = u.username || 'desconocido';
+            nombre   = `${u.nombre || ''} ${u.apellido || ''}`.trim();
+            rol      = u.rol || rol;
+          } catch { /* ignorar */ }
+        }
+
+        await apiClient.post('/audit-log', {
+          usuario_username: username,
+          usuario_nombre:   nombre,
+          usuario_rol:      rol,
+          modulo,
+          accion,
+          descripcion,
+          detalle,
+          exitoso,
+          error_detalle,
+        });
+      } catch (e) {
+        // El log no debe romper el flujo
+        console.warn('No se pudo registrar el log de auditoría:', e?.response?.data || e.message);
+      }
+    },
     
     async checkAuth() {
       const role = localStorage.getItem('user_rol');
@@ -261,12 +299,14 @@ export default {
             this.getAuthHeaders()
           );
           this.showPromotionMessage('Promoción actualizada exitosamente', 'success');
+          await this.registrarLog('promociones', 'UPDATE', `Actualización de promoción ID ${this.editingPromotion.id}`, { id: this.editingPromotion.id, ...this.promotionForm });
         } else {
           await apiClient.post('/promociones',
             this.promotionForm,
             this.getAuthHeaders()
           );
           this.showPromotionMessage('Promoción creada exitosamente', 'success');
+          await this.registrarLog('promociones', 'CREATE', `Nueva promoción para producto ID ${this.promotionForm.producto_id}`, this.promotionForm);
         }
         this.resetPromotionForm();
         this.loadPromociones();
@@ -276,6 +316,7 @@ export default {
           error.response?.data?.message || 'Error al guardar la promoción',
           'error'
         );
+        await this.registrarLog('promociones', this.editingPromotion ? 'UPDATE' : 'CREATE', 'Error al guardar promoción', null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -299,10 +340,12 @@ export default {
           this.getAuthHeaders()
         );
         this.showPromotionMessage('Promoción eliminada exitosamente', 'success');
+        await this.registrarLog('promociones', 'DELETE', `Promoción ID ${id} eliminada`, { id });
         this.loadPromociones();
       } catch (error) {
         console.error('Error al eliminar promoción:', error);
         this.showPromotionMessage('Error al eliminar la promoción', 'error');
+        await this.registrarLog('promociones', 'DELETE', `Error al eliminar promoción ID ${id}`, null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -349,18 +392,21 @@ export default {
             this.getAuthHeaders()
           );
           this.showBannerMessage('Banner actualizado exitosamente', 'success');
+          await this.registrarLog('banners', 'UPDATE', `Actualización de banner "${this.bannerForm.titulo}" (ID ${this.editingBanner.id})`, { id: this.editingBanner.id, ...this.bannerForm });
         } else {
           await apiClient.post('/tienda/banners',
             this.bannerForm,
             this.getAuthHeaders()
           );
           this.showBannerMessage('Banner creado exitosamente', 'success');
+          await this.registrarLog('banners', 'CREATE', `Nuevo banner "${this.bannerForm.titulo}"`, this.bannerForm);
         }
         this.resetBannerForm();
         this.loadBanners();
       } catch (error) {
         console.error('Error al guardar banner:', error);
         this.showBannerMessage('Error al guardar el banner', 'error');
+        await this.registrarLog('banners', this.editingBanner ? 'UPDATE' : 'CREATE', 'Error al guardar banner', null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -387,10 +433,12 @@ export default {
           this.getAuthHeaders()
         );
         this.showBannerMessage('Banner eliminado exitosamente', 'success');
+        await this.registrarLog('banners', 'DELETE', `Banner ID ${id} eliminado`, { id });
         this.loadBanners();
       } catch (error) {
         console.error('Error al eliminar banner:', error);
         this.showBannerMessage('Error al eliminar el banner', 'error');
+        await this.registrarLog('banners', 'DELETE', `Error al eliminar banner ID ${id}`, null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -453,6 +501,7 @@ export default {
           const formData = new FormData();
           formData.append('file', this.logoFile);
           await apiClient.post('/configuracion/logo/upload', formData);
+          await this.registrarLog('logo', 'UPLOAD', `Logo actualizado por subida de archivo`);
         } else {
           if (!this.logoForm.logo_url) {
             this.showLogoMessage('Ingresa una URL válida', 'error');
@@ -462,6 +511,7 @@ export default {
             { clave: 'logo_url', valor: this.logoForm.logo_url },
             this.getAuthHeaders()
           );
+          await this.registrarLog('logo', 'UPDATE', `Logo actualizado por URL`, { logo_url: this.logoForm.logo_url });
         }
         this.showLogoMessage('Logo actualizado exitosamente', 'success');
         this.logoLoadError = false;
@@ -472,6 +522,7 @@ export default {
       } catch (error) {
         console.error('Error al actualizar logo:', error);
         this.showLogoMessage('Error al actualizar el logo', 'error');
+        await this.registrarLog('logo', 'UPDATE', 'Error al actualizar logo', null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -631,6 +682,7 @@ export default {
             this.getAuthHeaders()
           );
           this.showUserMessage('Usuario actualizado exitosamente', 'success');
+          await this.registrarLog('usuarios', 'UPDATE', `Usuario "${this.editingUser.username}" actualizado (ID ${this.editingUser.id})`, { id: this.editingUser.id, campos_actualizados: Object.keys(updateData) });
         } else {
           // Crear usuario nuevo
           console.log('Enviando POST a:', `${API_BASE_URL}/usuarios`);
@@ -639,6 +691,7 @@ export default {
             this.getAuthHeaders()
           );
           this.showUserMessage('Usuario creado exitosamente', 'success');
+          await this.registrarLog('usuarios', 'CREATE', `Nuevo usuario "${this.userForm.username}" creado con rol ${this.userForm.rol}`, { username: this.userForm.username, rol: this.userForm.rol });
         }
         this.resetUserForm();
         this.loadUsuarios();
@@ -685,6 +738,7 @@ export default {
           this.getAuthHeaders()
         );
         this.showUserMessage('Usuario eliminado exitosamente', 'success');
+        await this.registrarLog('usuarios', 'DELETE', `Usuario ID ${id} eliminado`, { id });
         this.loadUsuarios();
       } catch (error) {
         console.error('Error al eliminar usuario:', error);
@@ -692,6 +746,7 @@ export default {
           error.response?.data?.message || 'Error al eliminar el usuario',
           'error'
         );
+        await this.registrarLog('usuarios', 'DELETE', `Error al eliminar usuario ID ${id}`, null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -766,6 +821,7 @@ export default {
           `✅ Contraseña de ${this.resetPasswordUser.nombre} ${this.resetPasswordUser.apellido} restablecida exitosamente`,
           'success'
         );
+        await this.registrarLog('usuarios', 'UPDATE', `Contraseña restablecida para usuario "${this.resetPasswordUser.username}" (ID ${this.resetPasswordUser.id})`, { usuario_id: this.resetPasswordUser.id });
         this.closeResetPasswordModal();
       } catch (error) {
         console.error('Error al resetear contraseña:', error);
@@ -896,6 +952,7 @@ export default {
             this.getAuthHeaders()
           );
           this.showPermisoMessage('Permiso actualizado exitosamente', 'success');
+          await this.registrarLog('permisos', 'UPDATE', `Permiso ID ${this.editingPermiso.id} actualizado para usuario ID ${this.editingPermiso.user_id}`, { id: this.editingPermiso.id });
         } else {
           // Convertir user_id a número y asegurar formato correcto
           const permisoData = {
@@ -910,6 +967,7 @@ export default {
             this.getAuthHeaders()
           );
           this.showPermisoMessage('Permiso otorgado exitosamente', 'success');
+          await this.registrarLog('permisos', 'CREATE', `Permiso "${permisoData.tipo_permiso}" otorgado a usuario ID ${permisoData.user_id}`, permisoData);
         }
         this.resetPermisoForm();
         this.loadPermisos();
@@ -919,6 +977,7 @@ export default {
           error.response?.data?.message || 'Error al guardar el permiso',
           'error'
         );
+        await this.registrarLog('permisos', this.editingPermiso ? 'UPDATE' : 'CREATE', 'Error al guardar permiso', null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -943,6 +1002,7 @@ export default {
           this.getAuthHeaders()
         );
         this.showPermisoMessage('Permiso revocado exitosamente', 'success');
+        await this.registrarLog('permisos', 'UPDATE', `Permiso ID ${id} revocado`, { id });
         this.loadPermisos();
       } catch (error) {
         console.error('Error al revocar permiso:', error);
@@ -950,6 +1010,7 @@ export default {
           error.response?.data?.message || 'Error al revocar el permiso',
           'error'
         );
+        await this.registrarLog('permisos', 'UPDATE', `Error al revocar permiso ID ${id}`, null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -961,6 +1022,7 @@ export default {
           this.getAuthHeaders()
         );
         this.showPermisoMessage('Permiso eliminado exitosamente', 'success');
+        await this.registrarLog('permisos', 'DELETE', `Permiso ID ${id} eliminado`, { id });
         this.loadPermisos();
       } catch (error) {
         console.error('Error al eliminar permiso:', error);
@@ -968,6 +1030,7 @@ export default {
           error.response?.data?.message || 'Error al eliminar el permiso',
           'error'
         );
+        await this.registrarLog('permisos', 'DELETE', `Error al eliminar permiso ID ${id}`, null, false, error.response?.data?.message || error.message);
       }
     },
 
@@ -1068,8 +1131,8 @@ export default {
     visibleTabs() {
       // Filtrar tabs según el rol del usuario
       return this.tabs.filter(tab => {
-        // Solo administradores ven el tab de usuarios y permisos
-        if ((tab.id === 'usuarios' || tab.id === 'permisos') && !this.isAdmin) {
+        // Solo administradores ven el tab de usuarios, permisos y actividad
+        if ((tab.id === 'usuarios' || tab.id === 'permisos' || tab.id === 'actividad') && !this.isAdmin) {
           return false;
         }
         return true;

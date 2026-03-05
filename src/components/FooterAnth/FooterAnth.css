@@ -24,7 +24,7 @@
 .footer-logo {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #ff7a1a;
+  color: var(--color-primary);
   margin-bottom: 8px;
   }
 
@@ -96,7 +96,7 @@
   }
 
 .footer-column a:hover {
-  color: #ff7a1a;
+  color: var(--color-primary);
   }
 
 .footer-bottom {
@@ -124,7 +124,7 @@
   }
 
 .footer-bottom-right a:hover {
-  color: #ff7a1a;
+  color: var(--color-primary);
   }
 
 @media (max-width: 768px) {

@@ -113,26 +113,44 @@
 
       <!-- Vista previa -->
       <div class="preview-section">
-        <h3>Vista Previa</h3>
-        <div class="preview-container" :style="previewStyles">
-          <button class="preview-btn primary" :style="{ backgroundColor: colores.primary }">
-            Botón Primario
-          </button>
-          <button class="preview-btn primary-dark" :style="{ backgroundColor: colores.primaryDark }">
-            Botón Hover
-          </button>
-          <button class="preview-btn success" :style="{ backgroundColor: colores.success }">
-            ✓ Éxito
-          </button>
-          <button class="preview-btn error" :style="{ backgroundColor: colores.error }">
-            ✗ Error
-          </button>
-          <div class="preview-link" :style="{ color: colores.primary }">
-            Enlace de ejemplo
+        <h3>Vista Previa en Tiempo Real</h3>
+
+        <!-- Mini cabecera -->
+        <p class="preview-label">Cabecera</p>
+        <div class="preview-header" :style="{ borderBottom: '2px solid ' + colores.primary }">
+          <span class="preview-logo" :style="{ color: colores.primary }">CHPC</span>
+          <div class="preview-search-btn" :style="{ background: 'linear-gradient(90deg, ' + colores.primaryLight + ', ' + colores.primary + ')' }">🔍</div>
+          <div class="preview-action-btn" :style="{ color: colores.primary, border: '1.5px solid ' + colores.primary }">🛒 Carrito</div>
+        </div>
+
+        <!-- Mini pie de página -->
+        <p class="preview-label">Pie de Página</p>
+        <div class="preview-footer">
+          <span class="preview-footer-logo" :style="{ color: colores.primary }">CHPC</span>
+          <a class="preview-footer-link" :style="{ color: colores.primary }">Inicio</a>
+          <a class="preview-footer-link" :style="{ color: colores.primary }">Contacto</a>
+        </div>
+
+        <!-- Notificación no leída -->
+        <p class="preview-label">Notificación</p>
+        <div class="preview-notification" :style="{ borderLeft: '4px solid ' + colores.primary, background: 'rgba(' + rgbPrimary + ', 0.08)' }">
+          <span class="preview-notif-icon">🔔</span>
+          <div>
+            <strong>Nuevo pedido recibido</strong>
+            <p style="font-size:0.8rem;color:#666;margin:2px 0 0">Tu pedido #1234 ha sido confirmado.</p>
           </div>
-          <div class="preview-badge" :style="{ backgroundColor: colores.primaryLight, color: colores.primaryDark }">
-            Etiqueta
-          </div>
+          <div class="preview-unread-dot" :style="{ background: colores.primary }"></div>
+        </div>
+
+        <!-- Botones de estado -->
+        <p class="preview-label">Botones y estados</p>
+        <div class="preview-container">
+          <button class="preview-btn" :style="{ backgroundColor: colores.primary }">Principal</button>
+          <button class="preview-btn" :style="{ backgroundColor: colores.primaryDark }">Hover</button>
+          <button class="preview-btn" :style="{ backgroundColor: colores.success }">✓ Éxito</button>
+          <button class="preview-btn" :style="{ backgroundColor: colores.error }">✗ Error</button>
+          <div class="preview-link" :style="{ color: colores.primary }">Enlace</div>
+          <div class="preview-badge" :style="{ backgroundColor: 'rgba(' + rgbPrimary + ', 0.15)', color: colores.primaryDark }">Etiqueta</div>
         </div>
       </div>
 

@@ -40,7 +40,7 @@
 
 .btn-mark-all {
   padding: 8px 16px;
-  background: #4a90e2;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 6px;
@@ -50,7 +50,7 @@
 }
 
 .btn-mark-all:hover {
-  background: #357abd;
+  background: var(--color-primary-dark);
 }
 
 /* Lista de notificaciones */
@@ -67,7 +67,7 @@
 
 .spinner {
   border: 3px solid #f3f3f3;
-  border-top: 3px solid #4a90e2;
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -115,8 +115,8 @@
 }
 
 .notification-item.unread {
-  background: #e8f4fd;
-  border-left: 4px solid #4a90e2;
+  background: var(--color-primary-alpha-10, #e8f4fd);
+  border-left: 4px solid var(--color-primary);
 }
 
 .notification-item:hover {
@@ -161,7 +161,7 @@
 
 .btn-view-order {
   padding: 6px 12px;
-  background: #4a90e2;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: 4px;
@@ -171,13 +171,13 @@
 }
 
 .btn-view-order:hover {
-  background: #357abd;
+  background: var(--color-primary-dark);
 }
 
 .unread-indicator {
   width: 10px;
   height: 10px;
-  background: #4a90e2;
+  background: var(--color-primary);
   border-radius: 50%;
   flex-shrink: 0;
   margin-top: 5px;

@@ -30,7 +30,12 @@
       <div v-if="activeTab === 'notificaciones'" class="tab-panel">
         <NotificationsPanel />
       </div>
-      
+
+      <!-- Tab de Actividad (Audit Log) -->
+      <div v-if="activeTab === 'actividad'" class="tab-panel">
+        <AdminLogs />
+      </div>
+
       <!-- Tab de Productos -->
       <div v-if="activeTab === 'productos'" class="tab-panel">
         <AdminProductos />
@@ -342,7 +347,7 @@
                 @error="logoLoadError = true"
               />
               <div v-if="logoLoadError" class="logo-load-error">
-                ⚠️ No se pudo cargar la imagen del logo. Verifica que la URL o el archivo sean accesibles.
+                No se pudo cargar la imagen del logo. Verifica que la URL o el archivo sean accesibles.
               </div>
             </div>
 

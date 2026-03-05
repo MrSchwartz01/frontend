@@ -92,11 +92,31 @@ export default {
     // Aplicar colores a las variables CSS
     applySiteColors(colores) {
       const root = document.documentElement;
-      if (colores.primary) root.style.setProperty('--color-primary', colores.primary);
+      if (colores.primary) {
+        root.style.setProperty('--color-primary', colores.primary);
+        // Derivar versiones alpha del color primario
+        const rgb = this.hexToRgb(colores.primary);
+        if (rgb) {
+          root.style.setProperty('--color-primary-alpha-10', `rgba(${rgb}, 0.1)`);
+          root.style.setProperty('--color-primary-alpha-20', `rgba(${rgb}, 0.2)`);
+          root.style.setProperty('--color-primary-alpha-30', `rgba(${rgb}, 0.3)`);
+        }
+      }
       if (colores.primaryDark) root.style.setProperty('--color-primary-dark', colores.primaryDark);
       if (colores.primaryLight) root.style.setProperty('--color-primary-light', colores.primaryLight);
       if (colores.success) root.style.setProperty('--color-success', colores.success);
       if (colores.error) root.style.setProperty('--color-error', colores.error);
+    },
+
+    // Convierte un color hex (#rrggbb) a "r, g, b" para usar en rgba()
+    hexToRgb(hex) {
+      const clean = hex.replace('#', '');
+      if (clean.length !== 6) return null;
+      const r = parseInt(clean.substring(0, 2), 16);
+      const g = parseInt(clean.substring(2, 4), 16);
+      const b = parseInt(clean.substring(4, 6), 16);
+      if (isNaN(r) || isNaN(g) || isNaN(b)) return null;
+      return `${r}, ${g}, ${b}`;
     },
     
     // Sistema de monitoreo de inactividad
