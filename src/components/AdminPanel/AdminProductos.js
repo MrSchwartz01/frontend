@@ -23,6 +23,7 @@ export default {
       // Filtros
       filtros: {
         busqueda: '',
+        tipoBusqueda: 'todos',
         marca: '',
         medida: '',
         stock: '',
@@ -37,6 +38,15 @@ export default {
     };
   },
   computed: {
+    placeholderBusqueda() {
+      const placeholders = {
+        todos: 'Nombre, código o marca...',
+        nombre: 'Buscar por nombre...',
+        marca: 'Buscar por marca...',
+        codigo: 'Buscar por código...',
+      };
+      return placeholders[this.filtros.tipoBusqueda] || 'Buscar...';
+    },
     totalPaginas() {
       return Math.ceil(this.productosFiltrados.length / this.productosPorPagina);
     },
@@ -182,11 +192,29 @@ export default {
       // Filtro por búsqueda de texto
       if (this.filtros.busqueda) {
         const busqueda = this.filtros.busqueda.toLowerCase();
-        resultado = resultado.filter(p =>
-          (p.producto && p.producto.toLowerCase().includes(busqueda)) ||
-          (p.codigo && p.codigo.toString().includes(busqueda)) ||
-          (p.marca && p.marca.toLowerCase().includes(busqueda))
-        );
+        switch (this.filtros.tipoBusqueda) {
+          case 'nombre':
+            resultado = resultado.filter(p =>
+              p.producto && p.producto.toLowerCase().includes(busqueda)
+            );
+            break;
+          case 'marca':
+            resultado = resultado.filter(p =>
+              p.marca && p.marca.toLowerCase().includes(busqueda)
+            );
+            break;
+          case 'codigo':
+            resultado = resultado.filter(p =>
+              p.codigo && p.codigo.toString().toLowerCase().includes(busqueda)
+            );
+            break;
+          default: // 'todos'
+            resultado = resultado.filter(p =>
+              (p.producto && p.producto.toLowerCase().includes(busqueda)) ||
+              (p.codigo && p.codigo.toString().toLowerCase().includes(busqueda)) ||
+              (p.marca && p.marca.toLowerCase().includes(busqueda))
+            );
+        }
       }
 
       // Filtro por marca
@@ -224,6 +252,7 @@ export default {
     limpiarFiltros() {
       this.filtros = {
         busqueda: '',
+        tipoBusqueda: 'todos',
         marca: '',
         medida: '',
         stock: '',

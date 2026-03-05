@@ -9,15 +9,28 @@
 
     <!-- Barra de filtros -->
     <div class="filtros-bar">
-      <div class="filtro-grupo">
+      <div class="filtro-grupo filtro-busqueda-grupo">
         <label>Buscar:</label>
-        <input
-          type="text"
-          v-model="filtros.busqueda"
-          placeholder="Nombre, código o marca..."
-          @input="aplicarFiltros"
-          class="filtro-input"
-        />
+        <div class="busqueda-combinada">
+          <select
+            v-model="filtros.tipoBusqueda"
+            @change="aplicarFiltros"
+            class="filtro-select filtro-tipo-busqueda"
+            title="Tipo de búsqueda"
+          >
+            <option value="todos">Todos</option>
+            <option value="nombre">Nombre</option>
+            <option value="marca">Marca</option>
+            <option value="codigo">Código</option>
+          </select>
+          <input
+            type="text"
+            v-model="filtros.busqueda"
+            :placeholder="placeholderBusqueda"
+            @input="aplicarFiltros"
+            class="filtro-input"
+          />
+        </div>
       </div>
 
       <div class="filtro-grupo">
