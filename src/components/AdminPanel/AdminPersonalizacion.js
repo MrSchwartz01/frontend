@@ -163,6 +163,7 @@ export default {
         
         // Guardar también en localStorage para persistencia inmediata
         localStorage.setItem('site_colors', JSON.stringify(this.colores));
+        await this.registrarLog('personalizacion', 'UPDATE', 'Colores del tema actualizados', { ...this.colores });
         
       } catch (error) {
         console.error('Error al guardar colores:', error);
@@ -203,6 +204,7 @@ export default {
         // Aplicar colores globalmente
         this.aplicarColoresCSS(this.colores);
         localStorage.setItem('site_colors', JSON.stringify(this.colores));
+        await this.registrarLog('personalizacion', 'UPDATE', 'Colores del tema restablecidos a los valores por defecto', null);
         
       } catch (error) {
         console.error('Error al resetear colores:', error);
@@ -230,6 +232,37 @@ export default {
       setTimeout(() => {
         this.mensaje = '';
       }, 3000);
+    },
+
+    // ========== AUDIT LOG ==========
+    async registrarLog(modulo, accion, descripcion, detalle = null, exitoso = true, error_detalle = null) {
+      try {
+        let username = 'desconocido';
+        let nombre   = '';
+        let rol      = localStorage.getItem('user_rol') || 'desconocido';
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          try {
+            const u = JSON.parse(usuarioJson);
+            username = u.username || 'desconocido';
+            nombre   = `${u.nombre || ''} ${u.apellido || ''}`.trim();
+            rol      = u.rol || rol;
+          } catch { /* ignorar */ }
+        }
+        await apiClient.post('/audit-log', {
+          usuario_username: username,
+          usuario_nombre:   nombre,
+          usuario_rol:      rol,
+          modulo,
+          accion,
+          descripcion,
+          detalle,
+          exitoso,
+          error_detalle,
+        });
+      } catch (e) {
+        console.warn('No se pudo registrar el log de auditoría:', e?.response?.data || e.message);
+      }
     },
   },
 };

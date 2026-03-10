@@ -335,18 +335,21 @@ export default {
             { headers }
           );
           this.$store.dispatch('mostrarToast', { mensaje: 'Producto actualizado correctamente', tipo: 'success' });
+          await this.registrarLog('productos', 'UPDATE', `Producto "${this.formProducto.producto}" actualizado (código ${this.productoActual.codigo})`, { codigo: this.productoActual.codigo, ...datosProducto });
         } else {
           // Crear nuevo producto
           await apiClient.post('/tienda/productos', this.formProducto, {
             headers,
           });
           this.$store.dispatch('mostrarToast', { mensaje: 'Producto creado correctamente', tipo: 'success' });
+          await this.registrarLog('productos', 'CREATE', `Nuevo producto "${this.formProducto.producto}" creado`, { ...this.formProducto });
         }
 
         await this.cargarProductos();
         this.cerrarEditModal();
       } catch (error) {
         console.error('Error al guardar producto:', error);
+        await this.registrarLog('productos', this.editando ? 'UPDATE' : 'CREATE', 'Error al guardar producto', null, false, error.response?.data?.message || error.message);
         this.$store.dispatch('mostrarToast', { mensaje: 'Error al guardar producto: ' + (error.response?.data?.message || error.message), tipo: 'error' });
       } finally {
         this.guardando = false;
@@ -366,6 +369,7 @@ export default {
         );
         await this.cargarProductos();
         this.$store.dispatch('mostrarToast', { mensaje: `Producto ${accion === 'desactivar' ? 'desactivado' : 'activado'} correctamente`, tipo: 'success' });
+        await this.registrarLog('productos', 'UPDATE', `Producto "${producto.producto}" ${accion === 'desactivar' ? 'desactivado' : 'activado'} (código ${producto.codigo})`, { codigo: producto.codigo, activo: !producto.activo });
       } catch (error) {
         console.error('Error al cambiar estado:', error);
         this.$store.dispatch('mostrarToast', { mensaje: 'Error al cambiar estado del producto', tipo: 'error' });
@@ -442,6 +446,7 @@ export default {
         console.log('✅ Respuesta:', response.data);
 
         this.$store.dispatch('mostrarToast', { mensaje: 'Imagen subida correctamente', tipo: 'success' });
+        await this.registrarLog('productos', 'UPLOAD', `Imagen subida para producto "${this.productoActual.producto}" (código ${this.productoActual.codigo})`, { codigo: this.productoActual.codigo, es_principal: this.imagenPrincipal, archivo: this.archivoSeleccionado?.name });
         this.archivoSeleccionado = null;
         this.imagenPrincipal = false;
         this.$refs.fileInput.value = '';
@@ -449,6 +454,7 @@ export default {
       } catch (error) {
         console.error('Error al subir imagen:', error);
         console.error('Respuesta del servidor:', error.response?.data);
+        await this.registrarLog('productos', 'UPLOAD', `Error al subir imagen para producto código ${this.productoActual?.codigo}`, null, false, error.response?.data?.message || error.message);
         this.$store.dispatch('mostrarToast', { mensaje: 'Error al subir imagen: ' + (error.response?.data?.message || error.response?.data?.detail || error.message), tipo: 'error' });
       } finally {
         this.subiendoImagen = false;
@@ -465,6 +471,7 @@ export default {
         );
         await this.cargarImagenes(this.productoActual.codigo);
         this.$store.dispatch('mostrarToast', { mensaje: 'Imagen marcada como principal', tipo: 'success' });
+        await this.registrarLog('productos', 'UPDATE', `Imagen ID ${imagen.id} marcada como principal en producto código ${this.productoActual.codigo}`, { imagen_id: imagen.id, codigo: this.productoActual.codigo });
       } catch (error) {
         console.error('Error al marcar imagen principal:', error);
         this.$store.dispatch('mostrarToast', { mensaje: 'Error al marcar imagen como principal', tipo: 'error' });
@@ -479,10 +486,42 @@ export default {
         await apiClient.delete(`/images/${imagenId}`);
         await this.cargarImagenes(this.productoActual.codigo);
         this.$store.dispatch('mostrarToast', { mensaje: 'Imagen eliminada correctamente', tipo: 'success' });
+        await this.registrarLog('productos', 'DELETE', `Imagen ID ${imagenId} eliminada del producto código ${this.productoActual.codigo}`, { imagen_id: imagenId, codigo: this.productoActual.codigo });
       } catch (error) {
         console.error('Error al eliminar imagen:', error);
         const errorMsg = error.response?.data?.message || 'Error desconocido';
         this.$store.dispatch('mostrarToast', { mensaje: `Error al eliminar imagen: ${errorMsg}`, tipo: 'error' });
+      }
+    },
+
+    // ========== AUDIT LOG ==========
+    async registrarLog(modulo, accion, descripcion, detalle = null, exitoso = true, error_detalle = null) {
+      try {
+        let username = 'desconocido';
+        let nombre   = '';
+        let rol      = localStorage.getItem('user_rol') || 'desconocido';
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          try {
+            const u = JSON.parse(usuarioJson);
+            username = u.username || 'desconocido';
+            nombre   = `${u.nombre || ''} ${u.apellido || ''}`.trim();
+            rol      = u.rol || rol;
+          } catch { /* ignorar */ }
+        }
+        await apiClient.post('/audit-log', {
+          usuario_username: username,
+          usuario_nombre:   nombre,
+          usuario_rol:      rol,
+          modulo,
+          accion,
+          descripcion,
+          detalle,
+          exitoso,
+          error_detalle,
+        });
+      } catch (e) {
+        console.warn('No se pudo registrar el log de auditoría:', e?.response?.data || e.message);
       }
     },
 

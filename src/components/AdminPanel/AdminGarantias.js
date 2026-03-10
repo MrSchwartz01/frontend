@@ -119,8 +119,10 @@ export default {
 
         this.cerrarModal();
         await this.cargarGarantias();
+        await this.registrarLog('garantias', this.modoEdicion ? 'UPDATE' : 'CREATE', `Garantía marca "${datos.marca}" ${this.modoEdicion ? 'actualizada' : 'creada'}`, datos);
       } catch (err) {
         console.error('Error al guardar garantía:', err);
+        await this.registrarLog('garantias', this.modoEdicion ? 'UPDATE' : 'CREATE', 'Error al guardar garantía', null, false, err.response?.data?.message || err.message);
         if (err.response?.data?.message) {
           this.error = err.response.data.message;
         } else {
@@ -149,6 +151,7 @@ export default {
 
       try {
         await apiClient.delete(`/garantias/${this.garantiaAEliminar.id}`);
+        await this.registrarLog('garantias', 'DELETE', `Garantía ID ${this.garantiaAEliminar.id} marca "${this.garantiaAEliminar.marca}" eliminada`, { id: this.garantiaAEliminar.id, marca: this.garantiaAEliminar.marca });
         this.cancelarEliminar();
         await this.cargarGarantias();
       } catch (err) {
@@ -157,6 +160,37 @@ export default {
         this.cancelarEliminar();
       } finally {
         this.eliminando = false;
+      }
+    },
+
+    // ========== AUDIT LOG ==========
+    async registrarLog(modulo, accion, descripcion, detalle = null, exitoso = true, error_detalle = null) {
+      try {
+        let username = 'desconocido';
+        let nombre   = '';
+        let rol      = localStorage.getItem('user_rol') || 'desconocido';
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          try {
+            const u = JSON.parse(usuarioJson);
+            username = u.username || 'desconocido';
+            nombre   = `${u.nombre || ''} ${u.apellido || ''}`.trim();
+            rol      = u.rol || rol;
+          } catch { /* ignorar */ }
+        }
+        await apiClient.post('/audit-log', {
+          usuario_username: username,
+          usuario_nombre:   nombre,
+          usuario_rol:      rol,
+          modulo,
+          accion,
+          descripcion,
+          detalle,
+          exitoso,
+          error_detalle,
+        });
+      } catch (e) {
+        console.warn('No se pudo registrar el log de auditoría:', e?.response?.data || e.message);
       }
     },
   },

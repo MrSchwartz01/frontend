@@ -196,6 +196,7 @@ export default {
             : '¡Playlist guardada exitosamente!',
           'success'
         );
+        await this.registrarLog('video', 'UPDATE', this.playlist.length === 0 ? 'Playlist de videos vaciada' : `Playlist guardada con ${this.playlist.length} video(s)`, { total: this.playlist.length });
       } catch (err) {
         console.error('Error al guardar playlist:', err);
         this.showMessage('Error al guardar la playlist', 'error');
@@ -209,6 +210,37 @@ export default {
       this.message = text;
       this.messageType = type;
       setTimeout(() => { this.message = ''; }, 4000);
+    },
+
+    // ========== AUDIT LOG ==========
+    async registrarLog(modulo, accion, descripcion, detalle = null, exitoso = true, error_detalle = null) {
+      try {
+        let username = 'desconocido';
+        let nombre   = '';
+        let rol      = localStorage.getItem('user_rol') || 'desconocido';
+        const usuarioJson = localStorage.getItem('usuario');
+        if (usuarioJson) {
+          try {
+            const u = JSON.parse(usuarioJson);
+            username = u.username || 'desconocido';
+            nombre   = `${u.nombre || ''} ${u.apellido || ''}`.trim();
+            rol      = u.rol || rol;
+          } catch { /* ignorar */ }
+        }
+        await apiClient.post('/audit-log', {
+          usuario_username: username,
+          usuario_nombre:   nombre,
+          usuario_rol:      rol,
+          modulo,
+          accion,
+          descripcion,
+          detalle,
+          exitoso,
+          error_detalle,
+        });
+      } catch (e) {
+        console.warn('No se pudo registrar el log de auditoría:', e?.response?.data || e.message);
+      }
     },
   },
 };
