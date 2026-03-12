@@ -96,6 +96,11 @@ export default {
     guardarCarrito() {
       localStorage.setItem("carrito", JSON.stringify(this.productosCarrito));
     },
+    formatPrice(price) {
+      const value = Number(price);
+      if (Number.isNaN(value)) return '0.00';
+      return value.toFixed(2);
+    },
     calcularSubtotal(item) {
       return (parseFloat(item.costoTotal) * item.cantidad).toFixed(2);
     },

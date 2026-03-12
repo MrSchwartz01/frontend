@@ -57,7 +57,7 @@
                   <h3 class="item-name">{{ item.producto }}</h3>
                   <p class="item-brand">{{ item.marca }}</p>
                   <p class="item-meta">Disponible</p>
-                  <p class="item-price">${{ item.costoTotal }}</p>
+                  <p class="item-price">${{ formatPrice(item.costoTotal) }}</p>
                 </div>
 
                 <div class="item-actions">

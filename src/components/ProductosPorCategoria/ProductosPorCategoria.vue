@@ -153,7 +153,7 @@
                 <p class="descripcion">{{ producto.medida }}</p>
                 <div class="producto-footer">
                   <div>
-                    <p class="precio" v-if="isAuthenticated">${{ producto.costoTotal }}</p>
+                    <p class="precio" v-if="isAuthenticated">${{ formatPrice(producto.costoTotal) }}</p>
                     <p class="precio" v-else>Inicia sesión para ver precio</p>
                     <p v-if="isAuthenticated" style="font-size: 0.75em; color: #999; margin: 0;">incluido IVA</p>
                   </div>

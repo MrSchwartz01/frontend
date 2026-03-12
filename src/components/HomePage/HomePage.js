@@ -177,6 +177,11 @@ export default {
     this.stopVideoTimer();
   },
   methods: {
+    formatPrice(price) {
+      const value = Number(price);
+      if (Number.isNaN(value)) return '0.00';
+      return value.toFixed(2);
+    },
     // ===== PLAYLIST =====
     buildEmbedUrl(baseUrl) {
       try {

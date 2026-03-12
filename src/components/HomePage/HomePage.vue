@@ -118,7 +118,7 @@
           <span class="price-current">${{ producto.promocion.precioConDescuento }}</span>
         </div>
         <div v-else>
-          <span class="price-current">${{ producto.costoTotal }}</span>
+          <span class="price-current">${{ formatPrice(producto.costoTotal) }}</span>
         </div>
       </div>
       <div v-else class="product-price">

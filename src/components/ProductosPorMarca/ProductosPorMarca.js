@@ -34,6 +34,11 @@ export default {
     await this.cargarProductosPorMarca(this.nombreMarca);
   },
   methods: {
+    formatPrice(price) {
+      const value = Number(price);
+      if (Number.isNaN(value)) return '0.00';
+      return value.toFixed(2);
+    },
     cerrarSesion() {
       localStorage.removeItem("access_token");
       this.isAuthenticated = false;
