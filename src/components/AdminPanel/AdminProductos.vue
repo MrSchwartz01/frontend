@@ -98,6 +98,13 @@
           <p class="stock">
             Stock: <strong>{{ producto.existenciaTotal }}</strong>
           </p>
+          <p class="fecha-modificacion" :class="{ 'sin-fecha': !producto.precioUnitario?.modificado }">
+            <span class="fecha-icono">🗓</span>
+            <span v-if="producto.precioUnitario?.modificado">
+              Precio actualizado: <strong>{{ producto.precioUnitario.modificado }}</strong>
+            </span>
+            <span v-else class="texto-sin-fecha">Sin fecha de modificación</span>
+          </p>
         </div>
 
         <div class="producto-actions">

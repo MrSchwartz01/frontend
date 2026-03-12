@@ -199,6 +199,29 @@
   font-size: 14px;
 }
 
+.producto-info .fecha-modificacion {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #5d6d7e;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed #dce1e7;
+}
+
+.producto-info .fecha-modificacion .fecha-icono {
+  font-size: 13px;
+}
+
+.producto-info .fecha-modificacion.sin-fecha {
+  opacity: 0.5;
+}
+
+.producto-info .fecha-modificacion .texto-sin-fecha {
+  font-style: italic;
+}
+
 .producto-actions {
   display: flex;
   gap: 10px;
