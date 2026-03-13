@@ -220,7 +220,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>Almacén</label>
-              <input v-model="formProducto.almacen" type="text" />
+              <input v-model="formProducto.bodega" type="text" />
             </div>
 
             <div class="form-group">
