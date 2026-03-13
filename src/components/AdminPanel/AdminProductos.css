@@ -777,3 +777,30 @@
     font-size: 13px;
   }
 }
+/* Info row en modal de edición */
+.form-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f4ff;
+  border: 1px solid #c7d7f9;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #4a5568;
+}
+
+.info-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.info-value {
+  color: #2d3748;
+}
+
+.info-value.sin-dato {
+  color: #a0aec0;
+  font-style: italic;
+}

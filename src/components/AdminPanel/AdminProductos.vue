@@ -182,6 +182,15 @@
         </div>
 
         <form @submit.prevent="guardarProducto" class="producto-form">
+          <!-- Fecha de última modificación (solo al editar) -->
+          <div v-if="editando" class="form-info-row">
+            <span class="info-label">🗓 Última modificación de precio:</span>
+            <strong v-if="productoActual?.precioUnitario?.modificado" class="info-value">
+              {{ productoActual.precioUnitario.modificado }}
+            </strong>
+            <span v-else class="info-value sin-dato">Sin registro</span>
+          </div>
+
           <div class="form-row">
             <div class="form-group">
               <label>Código del Producto *</label>
